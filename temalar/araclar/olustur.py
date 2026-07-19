@@ -205,10 +205,10 @@ YUVALAR = _yuva_hesapla()
 ETIKETLER = {                     # Türkçe • İngilizce isimler (yuvalardan uzakta)
     "balon":    ("BALON", "BALLOON", 42, 54.2, 3.0),
     "ucak":     ("UÇAK", "AIRPLANE", 196, 55.8, 3.0),
-    "traktor":  ("TRAKTÖR", "TRACTOR", 46, 131.55, 2.6),
-    "itfaiye":  ("İTFAİYE", "FIRE TRUCK", 115.5, 131.55, 2.6),
-    "araba":    ("ARABA", "CAR", 202, 131.55, 2.6),
-    "otobus":   ("OTOBÜS", "BUS", 277, 131.55, 2.6),
+    "traktor":  ("TRAKTÖR", "TRACTOR", 46, 131.0, 2.4),
+    "itfaiye":  ("İTFAİYE", "FIRE TRUCK", 115.5, 131.0, 2.4),
+    "araba":    ("ARABA", "CAR", 202, 131.0, 2.4),
+    "otobus":   ("OTOBÜS", "BUS", 277, 131.0, 2.4),
     "yelkenli": ("YELKENLİ", "SAILBOAT", 74, 174.8, 3.0),
     "feribot":  ("FERİBOT", "FERRY", 240, 175.2, 3.0),
 }
@@ -391,14 +391,18 @@ def teker(e, cx, cy, r, stil="araba"):
 
 
 def etiket(e, x, y, tr, en, boyut=3.0):
-    """Beyaz, koyu haleli parça adı: TÜRKÇE • İNGİLİZCE."""
+    """Krem plaka üstünde koyu parça adı: TÜRKÇE • İNGİLİZCE."""
     metin = f"{tr} • {en}"
-    for dx, dy in [(-0.35, 0), (0.35, 0), (0, -0.35), (0, 0.35),
-                   (-0.25, -0.25), (0.25, -0.25), (-0.25, 0.25), (0.25, 0.25)]:
-        e.append(_el("text", x=x + dx, y=y + dy, icerik=metin, fill="#17242E",
-                     font_size=boyut, font_family="sans-serif", font_weight="bold",
-                     text_anchor="middle", letter_spacing="0.35", opacity="0.85"))
-    e.append(_el("text", x=x, y=y, icerik=metin, fill="#FFFFFF", font_size=boyut,
+    w = len(metin) * boyut * 0.60 + (len(metin) - 1) * 0.35 + 4.4
+    h = boyut + 1.6
+    cy = y - 0.28 * boyut
+    e.append(_el("rect", x=x - w / 2, y=cy - h / 2 + 0.5, width=w, height=h, rx=1.4,
+                 fill="#14212C", opacity=0.16))
+    e.append(_el("rect", x=x - w / 2, y=cy - h / 2, width=w, height=h, rx=1.4,
+                 fill="#FCF9F1", opacity=0.96))
+    e.append(_el("rect", x=x - w / 2, y=cy - h / 2, width=w, height=h, rx=1.4,
+                 fill="none", stroke="#26343F", stroke_width=0.3, opacity=0.55))
+    e.append(_el("text", x=x, y=y, icerik=metin, fill="#22303B", font_size=boyut,
                  font_family="sans-serif", font_weight="bold", text_anchor="middle",
                  letter_spacing="0.35"))
 
