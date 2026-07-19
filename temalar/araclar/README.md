@@ -26,6 +26,10 @@ Beyaz mürekkep (alt zemin) dosyası bu üretimde **kullanılmıyor** — UV mak
 - `ALT_KATMAN_KESIM` (mavi): düz taban panosu (yalnız dış çerçeve).
 - `YAZI` (gri): etiketler — **kesilmez**, lazer yazılımında kapatın.
 
+### Marka logosu
+
+Baskının sağ üst köşesinde **zoziva** logosu yer alır. Kaynak: `varlik/zoziva_logo.png` (şeffaf zeminli, marka rengi #573720) — `olustur.py` bu dosyayı baskıya otomatik gömer; dosya yoksa uyarı basıp logosuz üretir.
+
 ### Baskıdaki isim etiketleri
 
 Üst katman baskısında her parçanın yanında **Türkçe • İngilizce** adı yazar (BALON • BALLOON, UÇAK • AIRPLANE, TRAKTÖR • TRACTOR, İTFAİYE • FIRE TRUCK, ARABA • CAR, OTOBÜS • BUS, YELKENLİ • SAILBOAT, FERİBOT • FERRY). Etiket konumları parmak yuvalarıyla çakışmaz. Yuvalar yalnız önizleme PNG'sinde gösterilir; baskı PDF'lerine kesim izi girmez.

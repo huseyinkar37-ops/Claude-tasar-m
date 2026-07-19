@@ -14,9 +14,11 @@ oluşur; morfolojik kapama/açma köşeleri yumuşatır ve TEK kapalı dış kon
 
 Çalıştırma:  python3 olustur.py
 """
+import base64
 import math
 import os
 import random
+import struct
 
 from shapely.affinity import rotate as s_dondur, scale as s_olcek, \
     translate as s_tasi
@@ -30,7 +32,9 @@ CORNER_R = 8.0               # dış köşe yuvarlatma (çocuk güvenliği)
 MIN_GAP = 7.5                # iki parça arası en az duvar (mm)
 MIN_EDGE = 6.0               # parça ile dış kenar arası en az duvar (mm)
 
-OUT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "cikti")
+KLASOR = os.path.dirname(os.path.abspath(__file__))
+OUT = os.path.join(KLASOR, "cikti")
+LOGO_PNG = os.path.join(KLASOR, "varlik", "zoziva_logo.png")  # şeffaf marka logosu
 
 # ---------------------------------------------------------------- geometri araçları
 def elips(cx, cy, rx, ry, aci=0.0):
@@ -275,8 +279,8 @@ def tanimlar():
     # ortam
     g.append(_lin("gok", 0, -6, 0, 72, [(0, "#3E92CC"), (0.5, "#7FC2E8"),
                                         (0.85, "#C6E7F5"), (1, "#EAF3E2")]))
-    g.append(_rad("gunes", 296, 12, 18, [(0, "#FFFDF0"), (0.35, "#FFF2BC", 0.95),
-                                         (0.7, "#FFE99A", 0.4), (1, "#FFE99A", 0)]))
+    g.append(_rad("gunes", 14, 8, 18, [(0, "#FFFDF0"), (0.35, "#FFF2BC", 0.95),
+                                       (0.7, "#FFE99A", 0.4), (1, "#FFE99A", 0)]))
     g.append(_lin("cim", 0, 58, 0, 92, [(0, "#94C96A"), (0.5, "#79B551"), (1, "#5E9C41")]))
     g.append(_lin("sis", 0, 55, 0, 67, [(0, "#FFFFFF", 0.0), (0.55, "#F2FAFE", 0.55),
                                         (1, "#F2FAFE", 0.0)]))
@@ -388,6 +392,28 @@ def teker(e, cx, cy, r, stil="araba"):
     e.append(_el("path", d=f"M {cx - rj*0.7:.2f} {cy - rj*0.7:.2f} "
                            f"A {rj:.2f} {rj:.2f} 0 0 1 {cx + rj*0.5:.2f} {cy - rj*0.86:.2f}",
                  fill="none", stroke="#FFFFFF", stroke_width=0.45, opacity=0.5))
+
+
+def logo_ciz(e):
+    """Marka logosunu sağ üst köşeye krem plaka üzerinde basar."""
+    if not os.path.exists(LOGO_PNG):
+        print("UYARI: logo bulunamadı, atlandı:", LOGO_PNG)
+        return
+    veri = open(LOGO_PNG, "rb").read()
+    px_w, px_h = struct.unpack(">II", veri[16:24])   # PNG IHDR
+    lw = 28.0
+    lh = lw * px_h / px_w
+    pw, ph = lw + 5.0, lh + 3.2
+    x0, y0 = 313.0 - pw, 5.8
+    e.append(_el("rect", x=x0, y=y0 + 0.5, width=pw, height=ph, rx=1.6,
+                 fill="#14212C", opacity=0.16))
+    e.append(_el("rect", x=x0, y=y0, width=pw, height=ph, rx=1.6,
+                 fill="#FCF9F1", opacity=0.96))
+    e.append(_el("rect", x=x0, y=y0, width=pw, height=ph, rx=1.6, fill="none",
+                 stroke="#26343F", stroke_width=0.3, opacity=0.55))
+    b64 = base64.b64encode(veri).decode()
+    e.append(f'<image x="{x0 + 2.5:.2f}" y="{y0 + 1.6:.2f}" width="{lw:.2f}" '
+             f'height="{lh:.2f}" xlink:href="data:image/png;base64,{b64}"/>')
 
 
 def etiket(e, x, y, tr, en, boyut=3.0, pad_y=2.2):
@@ -511,9 +537,9 @@ def sahne_svg(yuva_goster=False):
         e.append(_el("path", d=f"M {sx} {sy} q {sw*0.5} {-2.2} {sw} 0",
                      fill="none", stroke="#FFFFFF", stroke_width=1.6, opacity=0.16,
                      stroke_linecap="round"))
-    e.append(_el("circle", cx=296, cy=12, r=18, fill="url(#gunes)"))
-    e.append(_el("circle", cx=296, cy=12, r=6.2, fill="#FFF6D8"))
-    e.append(_el("circle", cx=296, cy=12, r=6.2, fill="none", stroke="#FFE9A0",
+    e.append(_el("circle", cx=14, cy=8, r=18, fill="url(#gunes)"))
+    e.append(_el("circle", cx=14, cy=8, r=6.2, fill="#FFF6D8"))
+    e.append(_el("circle", cx=14, cy=8, r=6.2, fill="none", stroke="#FFE9A0",
                  stroke_width=1.4, opacity=0.7))
     _bulut(e, 86, 15, 1.0, 0.95)
     _bulut(e, 253, 17, 0.7, 0.9)
@@ -634,7 +660,7 @@ def sahne_svg(yuva_goster=False):
         e.append(_el("rect", x=-6, y=wy + 1.15, width=W + 12, height=0.7, fill="#0E3A5E",
                      opacity=f"{op * 0.6}"))
     for _ in range(60):                                # güneş parıltısı
-        px, py = rnd.uniform(190, 310), rnd.uniform(137.5, 152)
+        px, py = rnd.uniform(24, 140), rnd.uniform(137.5, 152)
         e.append(_el("circle", cx=f"{px:.1f}", cy=f"{py:.1f}",
                      r=f"{rnd.uniform(0.15, 0.4):.2f}", fill="#FFFFFF",
                      opacity=f"{rnd.uniform(0.15, 0.4):.2f}"))
@@ -668,6 +694,8 @@ def sahne_svg(yuva_goster=False):
     # --- Türkçe • İngilizce parça adları (baskının parçası)
     for tr, en, ex, ey, boy, pay in ETIKETLER.values():
         etiket(e, ex, ey, tr, en, boy, pay)
+    # --- marka logosu (sağ üst köşe)
+    logo_ciz(e)
     return e
 
 # ---------------------------------------------------------------- araç detayları
@@ -1267,7 +1295,9 @@ def zemin_katmani():
 
 # ---------------------------------------------------------------- SVG belgeleri
 def svg_belge(w_mm, h_mm, icerik):
-    return (f'<svg xmlns="http://www.w3.org/2000/svg" width="{w_mm}mm" height="{h_mm}mm" '
+    return (f'<svg xmlns="http://www.w3.org/2000/svg" '
+            f'xmlns:xlink="http://www.w3.org/1999/xlink" '
+            f'width="{w_mm}mm" height="{h_mm}mm" '
             f'viewBox="0 0 {w_mm} {h_mm}">' + "\n".join(icerik) + "</svg>")
 
 
