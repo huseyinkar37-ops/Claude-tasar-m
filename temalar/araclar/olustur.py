@@ -1258,15 +1258,37 @@ def uret_baski_svg():
 
 
 def uret_kalip_svg():
+    """UV hizalama kalıbı: yalnız dış çerçeve konturu (1:1)."""
     icerik = [_el("path", d=yol_svg(cerceve_poly()), fill="none", stroke="#FF0000",
                   stroke_width=0.25)]
-    for _, poly, _ in PARCALAR:
-        icerik.append(_el("path", d=yol_svg(poly), fill="none", stroke="#FF0000",
-                          stroke_width=0.25))
     icerik.append(_el("text", x=6, y=177.2,
                       icerik="ARAÇLAR PUZZLE 320x180 – UV KALIP (1:1)",
                       fill="#888888", font_size="3", font_family="sans-serif"))
     return svg_belge(W, H, icerik)
+
+
+def uret_golge_svg():
+    """Alt katman gölge baskısı (324x184, 2 mm taşmalı): cep tabanlarına
+    parça gölgeleri basılır — çocuk parçanın yerini gölgeden bulur."""
+    ic = [f'<g transform="translate({BLEED},{BLEED})">']
+    ic.append(_el("rect", x=-6, y=-6, width=W + 12, height=76, fill="#DDEEF8"))
+    ic.append(_el("rect", x=-6, y=64, width=W + 12, height=28.5, fill="#E3F0DA"))
+    ic.append(_el("rect", x=-6, y=92, width=W + 12, height=44, fill="#E8E8EC"))
+    ic.append(_el("rect", x=-6, y=136, width=W + 12, height=50, fill="#D6EAF7"))
+    for yy in (92, 136):
+        ic.append(_el("rect", x=-6, y=yy - 0.3, width=W + 12, height=0.6,
+                      fill="#C9CDD2", opacity=0.6))
+    # parça gölgeleri: hafif içeri alınmış (0.4 mm) — cep duvarından taşmaz
+    for _, poly, _ in PARCALAR:
+        for iceri, op in ((-0.15, 0.4), (-0.55, 1.0)):
+            g = poly.buffer(iceri, quad_segs=8)
+            if g.is_empty:
+                continue
+            geoms = g.geoms if g.geom_type == "MultiPolygon" else [g]
+            for gg in geoms:
+                ic.append(_el("path", d=yol_svg(gg), fill="#5A6774", opacity=f"{op}"))
+    ic.append("</g>")
+    return svg_belge(W + 2 * BLEED, H + 2 * BLEED, ic)
 
 # ---------------------------------------------------------------- DXF
 def uret_dxf(dosya):
@@ -1317,13 +1339,17 @@ def main():
 
     baski = uret_baski_svg()
     kalip = uret_kalip_svg()
+    golge = uret_golge_svg()
 
     cairosvg.svg2pdf(bytestring=baski.encode(), write_to=f"{OUT}/araclar_uv_baski.pdf")
     cairosvg.svg2pdf(bytestring=kalip.encode(), write_to=f"{OUT}/araclar_uv_kalip.pdf")
+    cairosvg.svg2pdf(bytestring=golge.encode(), write_to=f"{OUT}/araclar_alt_golge.pdf")
     cairosvg.svg2png(bytestring=baski.encode(), write_to=f"{OUT}/araclar_onizleme.png",
                      output_width=2200)
     cairosvg.svg2png(bytestring=kalip.encode(), write_to=f"{OUT}/araclar_kalip_onizleme.png",
                      output_width=1920)
+    cairosvg.svg2png(bytestring=golge.encode(),
+                     write_to=f"{OUT}/araclar_alt_golge_onizleme.png", output_width=1920)
     uret_dxf(f"{OUT}/araclar_lazer_kesim.dxf")
 
     for ad, poly, sinif in PARCALAR:

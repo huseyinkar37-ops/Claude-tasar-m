@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is a **toy design studio** repository ("tasarım" = design). It produces manufacturing-ready files for two-layer educational children's puzzles: a top layer with vehicle/figure-shaped pockets cut out, glued onto a flat bottom layer. Each theme ships three production files: a UV-print alignment template (1:1 PDF), a UV-print artwork PDF with 2 mm bleed on every edge, and a laser-cutting DXF containing both layers.
+This is a **toy design studio** repository ("tasarım" = design). It produces manufacturing-ready files for two-layer educational children's puzzles: a top layer with vehicle/figure-shaped pockets cut out, glued onto a flat bottom layer. Each theme ships four production files: a UV-print alignment template (1:1 PDF, outer frame contour only), a top-layer UV artwork PDF with 2 mm bleed on every edge, a bottom-layer shadow-print PDF (piece silhouettes inset 0.4 mm, same bleed) so children can match pieces to pockets, and a laser-cutting DXF containing both layers. No white-ink underbase file is used.
 
 Known facts:
 
@@ -35,6 +35,6 @@ There is no test framework; each generator script self-validates its layout on r
 
 ## Conventions for New Themes
 
-- Copy `temalar/araclar/` as the starting point; keep the three-output contract and file-naming pattern (`<tema>_uv_kalip.pdf`, `<tema>_uv_baski.pdf`, `<tema>_lazer_kesim.dxf`).
+- Copy `temalar/araclar/` as the starting point; keep the four-output contract and file-naming pattern (`<tema>_uv_kalip.pdf`, `<tema>_uv_baski.pdf`, `<tema>_alt_golge.pdf`, `<tema>_lazer_kesim.dxf`).
 - Pieces must stay chunky for small hands: roughly 25–40 mm tall, no thin necks. Kerf compensation is deliberately NOT applied (the ~0.2 mm kerf gives the loose pocket fit desired for children).
 - Always eyeball the generated `*_onizleme.png` after changes — the layout validator catches spacing, not aesthetics.
