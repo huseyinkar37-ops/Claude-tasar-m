@@ -203,14 +203,14 @@ def _yuva_hesapla():
 YUVALAR = _yuva_hesapla()
 
 ETIKETLER = {                     # Türkçe • İngilizce isimler (yuvalardan uzakta)
-    "balon":    ("BALON", "BALLOON", 42, 54.2, 3.0),
-    "ucak":     ("UÇAK", "AIRPLANE", 196, 55.8, 3.0),
-    "traktor":  ("TRAKTÖR", "TRACTOR", 46, 131.0, 2.4),
-    "itfaiye":  ("İTFAİYE", "FIRE TRUCK", 115.5, 131.0, 2.4),
-    "araba":    ("ARABA", "CAR", 202, 131.0, 2.4),
-    "otobus":   ("OTOBÜS", "BUS", 277, 131.0, 2.4),
-    "yelkenli": ("YELKENLİ", "SAILBOAT", 74, 174.8, 3.0),
-    "feribot":  ("FERİBOT", "FERRY", 240, 175.2, 3.0),
+    "balon":    ("BALON", "BALLOON", 42, 55.0, 3.6, 2.2),
+    "ucak":     ("UÇAK", "AIRPLANE", 196, 56.4, 3.6, 2.2),
+    "traktor":  ("TRAKTÖR", "TRACTOR", 46, 131.1, 2.8, 1.2),
+    "itfaiye":  ("İTFAİYE", "FIRE TRUCK", 115.5, 131.1, 2.8, 1.2),
+    "araba":    ("ARABA", "CAR", 202, 131.1, 2.8, 1.2),
+    "otobus":   ("OTOBÜS", "BUS", 277, 131.1, 2.8, 1.2),
+    "yelkenli": ("YELKENLİ", "SAILBOAT", 74, 175.0, 3.6, 2.2),
+    "feribot":  ("FERİBOT", "FERRY", 240, 175.4, 3.6, 2.2),
 }
 
 # ---------------------------------------------------------------- doğrulama
@@ -390,11 +390,11 @@ def teker(e, cx, cy, r, stil="araba"):
                  fill="none", stroke="#FFFFFF", stroke_width=0.45, opacity=0.5))
 
 
-def etiket(e, x, y, tr, en, boyut=3.0):
+def etiket(e, x, y, tr, en, boyut=3.0, pad_y=2.2):
     """Krem plaka üstünde koyu parça adı: TÜRKÇE • İNGİLİZCE."""
     metin = f"{tr} • {en}"
-    w = len(metin) * boyut * 0.60 + (len(metin) - 1) * 0.35 + 4.4
-    h = boyut + 1.6
+    w = len(metin) * boyut * 0.60 + (len(metin) - 1) * 0.35 + 5.2
+    h = boyut + pad_y
     cy = y - 0.28 * boyut
     e.append(_el("rect", x=x - w / 2, y=cy - h / 2 + 0.5, width=w, height=h, rx=1.4,
                  fill="#14212C", opacity=0.16))
@@ -666,8 +666,8 @@ def sahne_svg(yuva_goster=False):
             e.append(_el("path", d=yol_svg(hilal), fill="none", stroke="#8A7350",
                          stroke_width=0.35))
     # --- Türkçe • İngilizce parça adları (baskının parçası)
-    for tr, en, ex, ey, boy in ETIKETLER.values():
-        etiket(e, ex, ey, tr, en, boy)
+    for tr, en, ex, ey, boy, pay in ETIKETLER.values():
+        etiket(e, ex, ey, tr, en, boy, pay)
     return e
 
 # ---------------------------------------------------------------- araç detayları
