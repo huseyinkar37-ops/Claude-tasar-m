@@ -203,14 +203,14 @@ def _yuva_hesapla():
 YUVALAR = _yuva_hesapla()
 
 ETIKETLER = {                     # Türkçe • İngilizce isimler (yuvalardan uzakta)
-    "balon":    ("BALON", "BALLOON", 42, 55.0, 3.6, 2.2),
-    "ucak":     ("UÇAK", "AIRPLANE", 196, 56.4, 3.6, 2.2),
-    "traktor":  ("TRAKTÖR", "TRACTOR", 46, 131.1, 2.8, 1.2),
-    "itfaiye":  ("İTFAİYE", "FIRE TRUCK", 115.5, 131.1, 2.8, 1.2),
-    "araba":    ("ARABA", "CAR", 202, 131.1, 2.8, 1.2),
-    "otobus":   ("OTOBÜS", "BUS", 277, 131.1, 2.8, 1.2),
-    "yelkenli": ("YELKENLİ", "SAILBOAT", 74, 175.0, 3.6, 2.2),
-    "feribot":  ("FERİBOT", "FERRY", 240, 175.4, 3.6, 2.2),
+    "balon":    ("BALON", "BALLOON", 42, 55.5, 4.0, 2.4),
+    "ucak":     ("UÇAK", "AIRPLANE", 196, 56.5, 4.0, 2.4),
+    "traktor":  ("TRAKTÖR", "TRACTOR", 46, 131.55, 3.0, 1.3),
+    "itfaiye":  ("İTFAİYE", "FIRE TRUCK", 115.5, 131.55, 3.0, 1.3),
+    "araba":    ("ARABA", "CAR", 202, 131.55, 3.0, 1.3),
+    "otobus":   ("OTOBÜS", "BUS", 277, 131.55, 3.0, 1.3),
+    "yelkenli": ("YELKENLİ", "SAILBOAT", 74, 175.3, 4.0, 2.4),
+    "feribot":  ("FERİBOT", "FERRY", 240, 175.5, 4.0, 2.4),
 }
 
 # ---------------------------------------------------------------- doğrulama
@@ -393,7 +393,7 @@ def teker(e, cx, cy, r, stil="araba"):
 def etiket(e, x, y, tr, en, boyut=3.0, pad_y=2.2):
     """Krem plaka üstünde koyu parça adı: TÜRKÇE • İNGİLİZCE."""
     metin = f"{tr} • {en}"
-    w = len(metin) * boyut * 0.60 + (len(metin) - 1) * 0.35 + 5.2
+    w = len(metin) * boyut * 0.70 + (len(metin) - 1) * 0.35 + 6.0
     h = boyut + pad_y
     cy = y - 0.28 * boyut
     e.append(_el("rect", x=x - w / 2, y=cy - h / 2 + 0.5, width=w, height=h, rx=1.4,
