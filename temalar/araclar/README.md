@@ -1,10 +1,10 @@
 # Araçlar Puzzle – Tema 01
 
-İki katmanlı eğitici çocuk puzzle'ı. Bitmiş ölçü **320 × 180 mm**, dış köşeler 8 mm yuvarlatılmış. 9 araç parçası, üç "dünya" şeridine yerleştirilmiştir — çocuk hem araçları hem nerede gittiklerini öğrenir:
+İki katmanlı eğitici çocuk puzzle'ı. Bitmiş ölçü **320 × 180 mm**, dış köşeler 8 mm yuvarlatılmış. 8 araç parçası, üç "dünya" şeridine yerleştirilmiştir — çocuk hem araçları hem nerede gittiklerini öğrenir:
 
 | Şerit | Parçalar |
 |---|---|
-| Gökyüzü | sıcak hava balonu, uçak, helikopter |
+| Gökyüzü | sıcak hava balonu, uçak |
 | Kara / yol | traktör, itfaiye, araba, otobüs |
 | Deniz | yelkenli, feribot |
 
