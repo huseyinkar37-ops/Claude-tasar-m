@@ -11,6 +11,10 @@ Known facts:
 - **Remote**: https://github.com/huseyinkar37-ops/Claude-tasar-m (public)
 - **Default branch**: `main`
 
+## Communication
+
+- Communicate with the user in Turkish (Türkçe): all conversation, explanations, and summaries should be written in Turkish. This is the repository owner's explicit preference.
+
 ## Guidance for Future Claude Code Instances
 
 - This file will be stale as soon as real code lands. Once the project has a package manifest, build tooling, or source layout, regenerate or update this file (e.g. via `/init`) so it documents the actual commands, architecture, and conventions.
