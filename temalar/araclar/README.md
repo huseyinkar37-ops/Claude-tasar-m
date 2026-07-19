@@ -22,9 +22,13 @@ Beyaz mürekkep (alt zemin) dosyası bu üretimde **kullanılmıyor** — UV mak
 
 ### DXF katmanları
 
-- `UST_KATMAN_KESIM` (kırmızı): dış çerçeve + 9 araç konturu. Araçları dış çizgisinden keser; parçalar **ve** cepler aynı kesimden çıkar.
+- `UST_KATMAN_KESIM` (kırmızı): dış çerçeve + 8 araç konturu + **8 parmak yuvası hilali**. Araçları dış çizgisinden keser; parçalar **ve** cepler aynı kesimden çıkar. Hilaller (R 5,5 mm yarım ay, her cebin açık tarafında) ayrı kapalı kesimlerdir: küçük hilal parçası fire olur, cep kenarında parmak yuvası kalır — parça şekli değişmez.
 - `ALT_KATMAN_KESIM` (mavi): düz taban panosu (yalnız dış çerçeve).
 - `YAZI` (gri): etiketler — **kesilmez**, lazer yazılımında kapatın.
+
+### Baskıdaki isim etiketleri
+
+Üst katman baskısında her parçanın yanında **Türkçe • İngilizce** adı yazar (BALON • BALLOON, UÇAK • AIRPLANE, TRAKTÖR • TRACTOR, İTFAİYE • FIRE TRUCK, ARABA • CAR, OTOBÜS • BUS, YELKENLİ • SAILBOAT, FERİBOT • FERRY). Etiket konumları parmak yuvalarıyla çakışmaz. Yuvalar yalnız önizleme PNG'sinde gösterilir; baskı PDF'lerine kesim izi girmez.
 
 ## Üretim notları
 

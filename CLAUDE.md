@@ -37,4 +37,5 @@ There is no test framework; each generator script self-validates its layout on r
 
 - Copy `temalar/araclar/` as the starting point; keep the four-output contract and file-naming pattern (`<tema>_uv_kalip.pdf`, `<tema>_uv_baski.pdf`, `<tema>_alt_golge.pdf`, `<tema>_lazer_kesim.dxf`).
 - Pieces must stay chunky for small hands: roughly 25–40 mm tall, no thin necks. Kerf compensation is deliberately NOT applied (the ~0.2 mm kerf gives the loose pocket fit desired for children).
+- Every pocket gets a half-moon finger notch (`YUVA_R` = 5.5 mm crescent, cut as a separate closed shape in the top-layer DXF) placed on the piece's open side; `dogrula()` checks notches keep ≥4 mm to other pieces and the frame. Turkish • English name labels are printed near each piece and must never overlap a notch. Notches appear in the preview PNG only — never in the print PDFs.
 - Always eyeball the generated `*_onizleme.png` after changes — the layout validator catches spacing, not aesthetics.

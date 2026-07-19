@@ -173,6 +173,46 @@ PARCALAR = [(ad, f(), sinif) for ad, f, sinif in [
     ("feribot",    kontur_feribot,    "deniz"),
 ]]
 
+# ---------------------------------------------------------------- parmak yuvaları
+# Her cebin kenarına yarım ay girinti: ayrı kapalı hilal olarak kesilir,
+# küçük parça fire olur, cepte parmak yuvası kalır. Parça şekli değişmez.
+YUVA_R = 5.5
+YUVA_KONUM = {                    # kontur üzerinde merkez; açık tarafa bakar
+    "balon":    (24.6, 27.0),     # sol
+    "ucak":     (162.0, 36.8),    # gövde altı (kanat ile kuyruk arası)
+    "traktor":  (13.6, 107.5),    # sol (ön ağırlık)
+    "itfaiye":  (114.0, 94.5),    # kasa üstü
+    "araba":    (202.5, 101.0),   # tavan
+    "otobus":   (277.0, 94.0),    # tavan
+    "yelkenli": (50.5, 163.3),    # sol baş omuzluk
+    "feribot":  (287.3, 163.3),   # sancak baş
+}
+
+
+def _yuva_hesapla():
+    yuvalar = {}
+    for ad, poly, _ in PARCALAR:
+        cx, cy = YUVA_KONUM[ad]
+        hilal = daire(cx, cy, YUVA_R).difference(poly)
+        if hilal.geom_type == "MultiPolygon":
+            hilal = max(hilal.geoms, key=lambda g: g.area)
+        yuvalar[ad] = Polygon(hilal.exterior).simplify(0.05, preserve_topology=True)
+    return yuvalar
+
+
+YUVALAR = _yuva_hesapla()
+
+ETIKETLER = {                     # Türkçe • İngilizce isimler (yuvalardan uzakta)
+    "balon":    ("BALON", "BALLOON", 42, 54.2, 3.0),
+    "ucak":     ("UÇAK", "AIRPLANE", 196, 55.8, 3.0),
+    "traktor":  ("TRAKTÖR", "TRACTOR", 46, 131.55, 2.6),
+    "itfaiye":  ("İTFAİYE", "FIRE TRUCK", 115.5, 131.55, 2.6),
+    "araba":    ("ARABA", "CAR", 202, 131.55, 2.6),
+    "otobus":   ("OTOBÜS", "BUS", 277, 131.55, 2.6),
+    "yelkenli": ("YELKENLİ", "SAILBOAT", 74, 174.8, 3.0),
+    "feribot":  ("FERİBOT", "FERRY", 240, 175.2, 3.0),
+}
+
 # ---------------------------------------------------------------- doğrulama
 def dogrula():
     hatalar = []
@@ -189,6 +229,18 @@ def dogrula():
                 hatalar.append(f"{a[0]} ile {b[0]} ÇAKIŞIYOR")
             elif d < MIN_GAP:
                 hatalar.append(f"{a[0]}–{b[0]} arası {d:.1f} mm (en az {MIN_GAP} mm)")
+    # parmak yuvaları: kendi parçasına bitişik, diğerlerinden ve kenardan uzak
+    for ad, hilal in YUVALAR.items():
+        sahip = next(p for n, p, _ in PARCALAR if n == ad)
+        if hilal.is_empty or hilal.area < 8:
+            hatalar.append(f"{ad} yuvası çok küçük (alan {hilal.area:.1f} mm²)")
+        if sahip.distance(hilal) > 0.15:
+            hatalar.append(f"{ad} yuvası kontura bitişik değil")
+        if hilal.distance(kenar) < 4.0:
+            hatalar.append(f"{ad} yuvası dış kenara {hilal.distance(kenar):.1f} mm")
+        for n, p, _ in PARCALAR:
+            if n != ad and hilal.distance(p) < 4.0:
+                hatalar.append(f"{ad} yuvası {n} parçasına {hilal.distance(p):.1f} mm")
     return hatalar
 
 # ---------------------------------------------------------------- SVG yardımcıları
@@ -338,6 +390,19 @@ def teker(e, cx, cy, r, stil="araba"):
                  fill="none", stroke="#FFFFFF", stroke_width=0.45, opacity=0.5))
 
 
+def etiket(e, x, y, tr, en, boyut=3.0):
+    """Beyaz, koyu haleli parça adı: TÜRKÇE • İNGİLİZCE."""
+    metin = f"{tr} • {en}"
+    for dx, dy in [(-0.35, 0), (0.35, 0), (0, -0.35), (0, 0.35),
+                   (-0.25, -0.25), (0.25, -0.25), (-0.25, 0.25), (0.25, 0.25)]:
+        e.append(_el("text", x=x + dx, y=y + dy, icerik=metin, fill="#17242E",
+                     font_size=boyut, font_family="sans-serif", font_weight="bold",
+                     text_anchor="middle", letter_spacing="0.35", opacity="0.85"))
+    e.append(_el("text", x=x, y=y, icerik=metin, fill="#FFFFFF", font_size=boyut,
+                 font_family="sans-serif", font_weight="bold", text_anchor="middle",
+                 letter_spacing="0.35"))
+
+
 def hacim(e, klip, poly, guc=0.12):
     x0, y0, x1, y1 = poly.bounds
     w, h = x1 - x0, y1 - y0
@@ -433,7 +498,7 @@ def _marti(e, x, y, s=1.0):
                  stroke_linecap="round"))
 
 # ---------------------------------------------------------------- sahne
-def sahne_svg():
+def sahne_svg(yuva_goster=False):
     rnd = random.Random(37)
     e = [tanimlar()]
     # --- gökyüzü + sirus bulutları + güneş
@@ -590,6 +655,15 @@ def sahne_svg():
     for _, poly, _ in PARCALAR:
         e.append(_el("path", d=yol_svg(poly), fill="none", stroke="#1C2833",
                      stroke_width=0.7, stroke_linejoin="round", opacity=0.8))
+    # --- parmak yuvaları (yalnız önizlemede gösterilir; baskıya girmez)
+    if yuva_goster:
+        for hilal in YUVALAR.values():
+            e.append(_el("path", d=yol_svg(hilal), fill="#DCC9A5", opacity=0.97))
+            e.append(_el("path", d=yol_svg(hilal), fill="none", stroke="#8A7350",
+                         stroke_width=0.35))
+    # --- Türkçe • İngilizce parça adları (baskının parçası)
+    for tr, en, ex, ey, boy in ETIKETLER.values():
+        etiket(e, ex, ey, tr, en, boy)
     return e
 
 # ---------------------------------------------------------------- araç detayları
@@ -1193,8 +1267,9 @@ def svg_belge(w_mm, h_mm, icerik):
             f'viewBox="0 0 {w_mm} {h_mm}">' + "\n".join(icerik) + "</svg>")
 
 
-def uret_baski_svg():
-    icerik = [f'<g transform="translate({BLEED},{BLEED})">'] + sahne_svg() + ["</g>"]
+def uret_baski_svg(yuva_goster=False):
+    icerik = ([f'<g transform="translate({BLEED},{BLEED})">']
+              + sahne_svg(yuva_goster) + ["</g>"])
     return svg_belge(W + 2 * BLEED, H + 2 * BLEED, icerik)
 
 
@@ -1256,6 +1331,8 @@ def uret_dxf(dosya):
     poli(cerceve_poly(), 0, "UST_KATMAN_KESIM")
     for _, poly, _ in PARCALAR:
         poli(poly, 0, "UST_KATMAN_KESIM")
+    for hilal in YUVALAR.values():          # parmak yuvası hilalleri
+        poli(hilal, 0, "UST_KATMAN_KESIM")
     dx_alt = W + 15
     poli(cerceve_poly(), dx_alt, "ALT_KATMAN_KESIM")
 
@@ -1278,15 +1355,16 @@ def main():
     os.makedirs(OUT, exist_ok=True)
     import cairosvg
 
-    baski = uret_baski_svg()
+    baski = uret_baski_svg(yuva_goster=False)      # baskıda kesim izi olmaz
+    onizleme = uret_baski_svg(yuva_goster=True)    # önizlemede yuvalar görünür
     kalip = uret_kalip_svg()
     golge = uret_golge_svg()
 
     cairosvg.svg2pdf(bytestring=baski.encode(), write_to=f"{OUT}/araclar_uv_baski.pdf")
     cairosvg.svg2pdf(bytestring=kalip.encode(), write_to=f"{OUT}/araclar_uv_kalip.pdf")
     cairosvg.svg2pdf(bytestring=golge.encode(), write_to=f"{OUT}/araclar_alt_golge.pdf")
-    cairosvg.svg2png(bytestring=baski.encode(), write_to=f"{OUT}/araclar_onizleme.png",
-                     output_width=2200)
+    cairosvg.svg2png(bytestring=onizleme.encode(),
+                     write_to=f"{OUT}/araclar_onizleme.png", output_width=2200)
     cairosvg.svg2png(bytestring=kalip.encode(), write_to=f"{OUT}/araclar_kalip_onizleme.png",
                      output_width=1920)
     cairosvg.svg2png(bytestring=golge.encode(),
