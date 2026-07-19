@@ -19,7 +19,7 @@ Known facts:
 ## Commands
 
 ```bash
-pip install ezdxf cairosvg          # dependencies (Python 3.11+)
+pip install ezdxf cairosvg shapely  # dependencies (Python 3.11+)
 cd temalar/<tema> && python3 olustur.py   # regenerate all production files into cikti/
 ```
 
@@ -28,9 +28,9 @@ There is no test framework; each generator script self-validates its layout on r
 ## Architecture
 
 - `temalar/<tema>/olustur.py` — one self-contained generator per puzzle theme. Everything is defined in millimeters in SVG-style y-down coordinates and emitted as: print PDF (with bleed offset), template PDF, preview PNGs (via cairosvg), and DXF (via ezdxf, y-axis flipped to y-up).
-- The core abstraction is the `Yol` path builder (move/line/cubic/arc). It records both an SVG path string **and** a sampled polyline from the same geometry, so the printed artwork and the DXF cut contours can never drift apart.
-- Each puzzle piece is a `kontur_*()` function returning **one closed contour** (lasers cut the outer outline only). Printed details (windows, stripes, text) are drawn separately in `arac_detaylari()`, clipped to the contour. Decorative background elements must stay outside all piece bounding boxes.
-- Layout constants that matter: 320×180 mm finished size, 2 mm bleed, 8 mm rounded corners, ≥7.5 mm wall between pieces, ≥6 mm to outer edges, no cut feature narrower than ~4 mm (wood strength). `dogrula()` enforces the clearances.
+- The core abstraction is shapely-based composition: each piece is built as a **union of primitives** (`kutu`/`elips`/`kapsul`/`cokgen`/`daire`), then `birlesim()` applies morphological closing+opening (fillets concave/convex corners, bridges sub-2.6 mm gaps, prunes sub-1.4 mm slivers) and returns ONE exterior ring. That same polygon feeds both the SVG artwork and the DXF polylines, so print and cut can never drift apart.
+- Each puzzle piece is a `kontur_*()` function returning **one closed contour** (lasers cut the outer outline only — no holes). Printed details (windows, stripes, text, gradients, `hacim()` light/shade overlays, `teker()` wheels) are drawn separately in `arac_detaylari()`, clipped to the contour. Decorative background elements must stay outside all piece bounding boxes.
+- Layout constants that matter: 320×180 mm finished size, 2 mm bleed, 8 mm rounded corners, ≥7.5 mm wall between pieces, ≥6 mm to outer edges, no cut feature narrower than ~4 mm (wood strength). `dogrula()` enforces the clearances with real polygon distances (not bounding boxes).
 - DXF layers: `UST_KATMAN_KESIM` (top layer: frame + piece contours), `ALT_KATMAN_KESIM` (flat bottom frame), `YAZI` (non-cut labels). Both boards are laid out side by side in one file.
 
 ## Conventions for New Themes

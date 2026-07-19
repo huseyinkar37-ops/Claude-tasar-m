@@ -33,8 +33,8 @@
 ## Yeniden üretme
 
 ```bash
-pip install ezdxf cairosvg
+pip install ezdxf cairosvg shapely
 python3 olustur.py
 ```
 
-Tüm geometri `olustur.py` içinde milimetre cinsinden tanımlıdır; bir aracı taşımak/yeniden çizmek için ilgili `kontur_*` fonksiyonunu düzenleyip betiği yeniden çalıştırın. Yerleşim kuralları ihlal edilirse betik uyarı basar.
+Tüm geometri `olustur.py` içinde milimetre cinsinden tanımlıdır. Her araç konturu, basit şekillerin (kutu/elips/kapsül/çokgen) **birleşiminden** oluşturulur; `birlesim()` köşeleri yumuşatır ve lazer için tek kapalı dış çizgi üretir. Bir aracı değiştirmek için ilgili `kontur_*` fonksiyonundaki parçaları düzenleyip betiği yeniden çalıştırın — baskı ve DXF aynı konturdan türediği için asla ayrışmaz. Yerleşim kuralları (gerçek çokgen mesafeleriyle) ihlal edilirse betik uyarı basar.
