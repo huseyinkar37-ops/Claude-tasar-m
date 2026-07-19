@@ -282,28 +282,28 @@ def _rad(idad, cx, cy, r, duraklar):
 
 def tanimlar():
     g = []
-    g.append(_lin("su", 0, -6, 0, 186, [(0, "#8FDCEC"), (0.3, "#57B6DA"),
-                                        (0.65, "#2F88BE"), (1, "#1B5E94")]))
+    g.append(_lin("su", 0, -6, 0, 186, [(0, "#93DEEC"), (0.28, "#54B2D8"),
+                                        (0.62, "#2B84BB"), (1, "#175788")]))
     g.append(_lin("kum", 0, 156, 0, 184, [(0, "#EFDFAF"), (0.5, "#E3CD94"),
                                           (1, "#D2B577")]))
     g.append(_rad("gunes_su", 30, 0, 55, [(0, "#FFFBE0", 0.75), (0.5, "#F2F7D8", 0.3),
                                           (1, "#F2F7D8", 0)]))
-    g.append(_lin("yunusg", 0, 9, 0, 50, [(0, "#8FB2C9"), (0.45, "#5F8AA8"),
-                                          (1, "#3E637F")]))
-    g.append(_rad("anasig", 149, 22, 32, [(0, "#F7CBDF"), (0.55, "#E39FC6"),
-                                          (1, "#BC74A4")]))
-    g.append(_lin("atig", 0, 62, 0, 118, [(0, "#FFCB72"), (0.5, "#F29A3E"),
-                                          (1, "#D3752B")]))
-    g.append(_lin("kabukg", 0, 60, 0, 108, [(0, "#93B765"), (0.5, "#64934B"),
-                                            (1, "#426F36")]))
-    g.append(_lin("baligg", 0, 66, 0, 106, [(0, "#FFA352"), (0.5, "#F2712E"),
-                                            (1, "#D6521E")]))
-    g.append(_lin("ahtapotg", 0, 120, 0, 172, [(0, "#BE87D8"), (0.5, "#9B5FB9"),
-                                               (1, "#744093")]))
-    g.append(_lin("yengecg", 0, 126, 0, 172, [(0, "#FF8663"), (0.5, "#E94E33"),
-                                              (1, "#B83423")]))
-    g.append(_rad("yildizg", 261, 144, 32, [(0, "#FFCB72"), (0.55, "#F29A3E"),
-                                            (1, "#D9752B")]))
+    g.append(_lin("yunusg", 0, 12, 0, 48, [(0, "#5E7E95"), (0.4, "#8CA5B7"),
+                                           (0.72, "#C2D1DB"), (1, "#E6EDF2")]))
+    g.append(_rad("anasig", 149, 21, 34, [(0, "#F9DCEA"), (0.45, "#EFB9D5"),
+                                          (0.8, "#D492BC"), (1, "#B9749F")]))
+    g.append(_lin("atig", 0, 62, 0, 118, [(0, "#F7B95C"), (0.5, "#E08F33"),
+                                          (1, "#B96F24")]))
+    g.append(_lin("kabukg", 0, 60, 0, 108, [(0, "#7E9F52"), (0.55, "#587E3D"),
+                                            (1, "#3A5C2A")]))
+    g.append(_lin("baligg", 0, 66, 0, 106, [(0, "#FF9440"), (0.5, "#EE6519"),
+                                            (1, "#C7480F")]))
+    g.append(_lin("ahtapotg", 0, 120, 0, 174, [(0, "#C98263"), (0.5, "#A5583C"),
+                                               (1, "#7C3B26")]))
+    g.append(_lin("yengecg", 0, 126, 0, 172, [(0, "#E8764F"), (0.5, "#C74A2C"),
+                                              (1, "#94301C")]))
+    g.append(_rad("yildizg", 261, 144, 34, [(0, "#EFA45C"), (0.55, "#D07733"),
+                                            (1, "#A85420")]))
     return "<defs>" + "".join(g) + "</defs>"
 
 
@@ -440,6 +440,21 @@ def sahne_svg(yuva_goster=False):
     for x0, x1t, geno, genb in [(36, 66, 9, 26), (96, 150, 12, 34), (208, 190, 10, 30)]:
         e.append(_el("path", d=f"M {x0-geno} 4 L {x0+geno} 4 L {x1t+genb} 96 "
                                f"L {x1t-genb} 96 Z", fill="#EAF9E8", opacity=0.05))
+    # kostik ışık ağı (yüzeye yakın kırılan ışık)
+    for fy, faz in [(10, 0), (17, 11), (25, 5)]:
+        d = f"M -6 {fy} "
+        for i in range(15):
+            x0 = -6 + i * 23
+            yy = fy + (2.6 if (i + faz) % 2 else -2.6)
+            d += f"Q {x0 + 11.5} {yy} {x0 + 23} {fy} "
+        e.append(_el("path", d=d, fill="none", stroke="#E8FBFC",
+                     stroke_width=1.3, opacity=0.12))
+    # asılı parçacıklar (plankton/kum)
+    for _ in range(44):
+        px, py = rnd.uniform(-4, 322), rnd.uniform(10, 152)
+        e.append(_el("circle", cx=f"{px:.1f}", cy=f"{py:.1f}",
+                     r=f"{rnd.uniform(0.12, 0.3):.2f}", fill="#E8F6FC",
+                     opacity=f"{rnd.uniform(0.15, 0.35):.2f}"))
     # arka plan küçük balık sürüleri + kabarcıklar
     for fx, fy, s, yon in [(272, 28, 1.0, -1), (282, 35, 0.85, -1), (271, 41, 0.8, -1),
                            (290, 30, 0.7, -1), (72, 92, 0.9, 1), (82, 98, 0.75, 1),
@@ -461,6 +476,13 @@ def sahne_svg(yuva_goster=False):
         e.append(_el("circle", cx=f"{px:.1f}", cy=f"{py:.1f}",
                      r=f"{rnd.uniform(0.15, 0.4):.2f}", fill="#B7975C",
                      opacity=f"{rnd.uniform(0.25, 0.5):.2f}"))
+    # çakıllar
+    for cxk, cyk, crx in [(34, 174, 2.4), (103, 176.5, 2.0), (207, 175, 2.2),
+                          (305, 177.5, 1.9), (146, 177.8, 1.7)]:
+        e.append(_el("ellipse", cx=cxk, cy=cyk, rx=crx, ry=crx * 0.55,
+                     fill="#C4A468"))
+        e.append(_el("ellipse", cx=cxk - crx * 0.25, cy=cyk - crx * 0.2,
+                     rx=crx * 0.5, ry=crx * 0.25, fill="#DEC28A", opacity=0.8))
     # taban dekoru (parça alanlarının dışında)
     kaya(e, 116, 168, 13, 7)
     kaya(e, 124, 169.5, 9, 4.8, "#54707E")
@@ -498,242 +520,405 @@ def canli_detaylari():
     e = []
     P = {ad: poly for ad, poly, _ in PARCALAR}
 
-    # ---------- YUNUS
+    # ---------- YUNUS (afalina: sırt pelerini + karşı gölgeleme)
     y = P["yunus"]
     ky = _klip(e, "kyunus", y)
     e.append(_el("path", d=yol_svg(y), fill="url(#yunusg)"))
-    # açık karın (gövde kavisini izler)
-    e.append(_el("path", d="M 24 31.5 Q 58 45 93 32.5 L 93 50 L 24 50 Z",
-                 fill="#DCE9F2", clip_path=ky))
-    e.append(_el("path", d="M 24 31.5 Q 58 45 93 32.5", fill="none", stroke="#4A7089",
-                 stroke_width=0.5, opacity=0.6, clip_path=ky))
-    # yan süpürme (açık gri şerit)
-    e.append(_el("path", d="M 30 27 Q 58 36 88 29.5 Q 58 40 30 31 Z", fill="#9FBDD1",
-                 opacity=0.5, clip_path=ky))
-    # yüzgeç gölgeleri
-    e.append(_el("path", d="M 54 12.5 L 64 15 L 57 21.5 L 50 19 Z", fill="#3E637F",
-                 clip_path=ky, opacity=0.85))
-    e.append(_el("ellipse", cx=62, cy=41.5, rx=8, ry=4.5, fill="#33566E", opacity=0.8,
+    # koyu sırt pelerini (üst gövdeyi kaplar; sırt yüzgecinde derinleşir)
+    e.append(_el("path", d="M 97 30.5 Q 84 26.5 74 27 Q 58 33.5 42 32.5 Q 24 30.5 "
+                           "8 25.5 L 8 2 L 97 2 Z", fill="#46647A", clip_path=ky,
+                 opacity=0.97))
+    e.append(_el("path", d="M 97 30.5 Q 84 26.5 74 27 Q 58 33.5 42 32.5 Q 24 30.5 8 25.5",
+                 fill="none", stroke="#3A5568", stroke_width=0.6, opacity=0.6,
+                 clip_path=ky))
+    # beyaz karın
+    e.append(_el("path", d="M 22 34.5 Q 58 45.5 94 34 L 94 50 L 22 50 Z",
+                 fill="#F0F5F8", clip_path=ky))
+    # yan ışıltı şeridi
+    e.append(_el("path", d="M 26 30 Q 58 38 90 30.5 Q 58 42 26 33.5 Z", fill="#AEC4D2",
+                 opacity=0.55, clip_path=ky))
+    # yüzgeç gölgeleri (sırt, göğüs, kuyruk)
+    e.append(_el("path", d="M 54 12.5 L 64 15 L 57 21.5 L 50 19 Z", fill="#3A566B",
+                 clip_path=ky, opacity=0.95))
+    e.append(_el("ellipse", cx=62, cy=41.5, rx=8, ry=4.5, fill="#33566E", opacity=0.9,
                  transform="rotate(35 62 41.5)", clip_path=ky))
     e.append(_el("path", d="M 26 26 L 15 17 M 26 30 L 15 39", stroke="#33566E",
-                 stroke_width=1.6, opacity=0.5, fill="none", clip_path=ky))
-    # sırt parlaması + hava deliği
-    e.append(_el("path", d="M 34 22 C 52 15.5 74 16 88 24", fill="none",
-                 stroke="#C9DEEB", stroke_width=1.6, opacity=0.55, clip_path=ky))
-    e.append(_el("ellipse", cx=71, cy=18.4, rx=1.2, ry=0.55, fill="#2E4A5E",
-                 opacity=0.9))
-    # göz + gülümseyen ağız
-    e.append(_el("circle", cx=80, cy=29.5, r=2.0, fill="#12242F"))
-    e.append(_el("circle", cx=80.6, cy=28.9, r=0.65, fill="#FFFFFF", opacity=0.9))
-    e.append(_el("path", d="M 84.5 33.6 Q 89.5 36.2 94.5 34.2", fill="none",
-                 stroke="#12242F", stroke_width=0.85, opacity=0.85))
-    hacim(e, "kyunus", y, 0.11)
+                 stroke_width=1.8, opacity=0.55, fill="none", clip_path=ky))
+    e.append(_el("path", d="M 24 28.6 L 16 27.8", stroke="#33566E", stroke_width=0.6,
+                 opacity=0.5, fill="none", clip_path=ky))
+    # melon kırışığı + hava deliği
+    e.append(_el("path", d="M 84 24.5 Q 87.5 26.5 89.5 29.5", fill="none",
+                 stroke="#4A6B82", stroke_width=0.5, opacity=0.7, clip_path=ky))
+    e.append(_el("ellipse", cx=71, cy=18.2, rx=1.3, ry=0.55, fill="#2E4A5E",
+                 opacity=0.95))
+    # uzun ağız hattı (gape) + küçük gerçekçi göz
+    e.append(_el("path", d="M 95.5 32.6 Q 87 35.2 80 34.2", fill="none",
+                 stroke="#2E4A5E", stroke_width=0.7, opacity=0.9))
+    e.append(_el("path", d="M 80 34.2 Q 78.5 34.6 77.6 35.6", fill="none",
+                 stroke="#2E4A5E", stroke_width=0.55, opacity=0.8))
+    e.append(_el("circle", cx=81.8, cy=30.8, r=1.35, fill="#101E28"))
+    e.append(_el("circle", cx=82.2, cy=30.4, r=0.4, fill="#DCE9F2", opacity=0.95))
+    e.append(_el("path", d="M 80.2 29.6 A 2 2 0 0 1 83.4 29.6", fill="none",
+                 stroke="#4A6B82", stroke_width=0.4, opacity=0.7))
+    # flank parlama çizgileri
+    e.append(_el("path", d="M 36 23.5 C 52 19 72 19.5 86 25", fill="none",
+                 stroke="#D5E3EC", stroke_width=1.1, opacity=0.5, clip_path=ky))
+    hacim(e, "kyunus", y, 0.10)
 
-    # ---------- DENİZANASI
+    # ---------- DENİZANASI (ay denizanası: gonadlar + radyal kanallar)
     a = P["denizanasi"]
     ka = _klip(e, "kanasi", a)
     e.append(_el("path", d=yol_svg(a), fill="url(#anasig)"))
-    # iç ışıma + kubbe çizgileri
-    e.append(_el("ellipse", cx=147, cy=20, rx=13, ry=8.5, fill="#FBE3EE", opacity=0.75,
-                 clip_path=ka))
-    for dx in (-12, -4, 4, 12):
-        e.append(_el("path", d=f"M {149+dx} 11 C {149+dx*1.25} 18 {149+dx*1.25} 26 "
-                               f"{149+dx*1.05} 32", fill="none", stroke="#C481AC",
-                     stroke_width=0.6, opacity=0.7, clip_path=ka))
+    # çan kenarı yarı saydam bant
+    e.append(_el("path", d="M 129.5 24 A 20 16 0 0 1 168.5 24", fill="none",
+                 stroke="#FBE9F2", stroke_width=2.2, opacity=0.5, clip_path=ka))
+    # radyal kanallar (8 adet)
+    for dx in (-15, -10.5, -6, -2, 2, 6, 10.5, 15):
+        e.append(_el("path", d=f"M {149 + dx * 0.18} 10.5 C {149 + dx * 0.85} 17 "
+                               f"{149 + dx * 1.1} 25 {149 + dx} 32.5", fill="none",
+                     stroke="#C481AC", stroke_width=0.45, opacity=0.65, clip_path=ka))
+    # dört at nalı gonad (ay denizanası imzası)
+    for gx, gy in [(145, 20.5), (153, 20.5), (144.5, 26.5), (153.5, 26.5)]:
+        e.append(_el("circle", cx=gx, cy=gy, r=2.5, fill="#D287B4", opacity=0.85))
+        e.append(_el("path", d=f"M {gx - 1.6} {gy + 0.9} A 2 2 0 0 1 {gx + 1.6} {gy + 0.9}",
+                     fill="none", stroke="#A85E90", stroke_width=0.7, opacity=0.85))
+        e.append(_el("circle", cx=gx - 0.6, cy=gy - 0.7, r=0.7, fill="#F4C7DE",
+                     opacity=0.9))
     # etek fisto çizgisi
     e.append(_el("path", d="M 130 33.5 Q 133.5 38.5 137.5 34.5 Q 141 39.5 145.2 34.8 "
                            "Q 149 39.8 153 34.8 Q 156.8 39.5 160.5 34.5 Q 164.5 38.5 168 33.5",
-                 fill="none", stroke="#A85E90", stroke_width=0.8, opacity=0.85,
+                 fill="none", stroke="#A85E90", stroke_width=0.75, opacity=0.8,
                  clip_path=ka))
-    # tentakül şeritleri + benekler
-    for tx1, ty1, tx2, ty2 in [(137.5, 38, 132.5, 49), (148.5, 39, 148.5, 51),
-                               (159.5, 38, 164.5, 49)]:
+    # ağız kolları (frilli, yarı saydam)
+    for ox in (143.5, 154.5):
+        e.append(_el("path", d=f"M {ox} 31 q -2.4 3.4 0.6 6.4 q 2.8 3 0.4 6.4 "
+                               f"q 2.6 -2.6 1.2 -6.2 q -1.6 -3.2 0.6 -6.2 Z",
+                     fill="#EFC0DA", opacity=0.75, clip_path=ka))
+    # tentakül gölge şeritleri
+    for tx1, ty1, tx2, ty2 in [(137.5, 38, 133, 46), (148.5, 39, 148.5, 48),
+                               (159.5, 38, 164, 46)]:
         e.append(_el("line", x1=tx1, y1=ty1, x2=tx2, y2=ty2, stroke="#A85E90",
-                     stroke_width=1.1, opacity=0.8, clip_path=ka))
-    for sx, sy in [(139, 22), (150, 17), (158, 24), (144, 28), (154, 29)]:
-        e.append(_el("circle", cx=sx, cy=sy, r=1.0, fill="#FFFFFF", opacity=0.55))
-    hacim(e, "kanasi", a, 0.10)
+                     stroke_width=1.0, opacity=0.7, clip_path=ka))
+    # çan üstü parlama
+    e.append(_el("ellipse", cx=142, cy=15.5, rx=8.5, ry=4.5, fill="#FFFFFF",
+                 opacity=0.4, transform="rotate(-18 142 15.5)"))
+    hacim(e, "kanasi", a, 0.08)
 
-    # ---------- DENİZATI (detaylar yerel koordinatta, grupla taşınır)
+    # ---------- DENİZATI (kemik halkalı gövde, yerel koordinat + taşıma)
     d = s_tasi(P["denizati"], 0, 2.5)
     e.append('<g transform="translate(0,-2.5)">')
     kd = _klip(e, "kati", d)
     e.append(_el("path", d=yol_svg(d), fill="url(#atig)"))
-    # karın boğumları
+    # gövde kemik halkaları (çift çizgi + sırt düğmeleri)
+    for i in range(7):
+        yy = 82 + i * 4.6
+        e.append(_el("path", d=f"M 31.5 {yy} Q 41 {yy + 2.6} 51 {yy}", fill="none",
+                     stroke="#B05E1C", stroke_width=0.7, opacity=0.75, clip_path=kd))
+        e.append(_el("path", d=f"M 31.5 {yy + 1.1} Q 41 {yy + 3.7} 51 {yy + 1.1}",
+                     fill="none", stroke="#FFDCA0", stroke_width=0.4, opacity=0.55,
+                     clip_path=kd))
     for i in range(6):
-        yy = 84 + i * 5.2
-        e.append(_el("path", d=f"M 32 {yy} Q 41 {yy+2.8} 50.5 {yy}", fill="none",
-                     stroke="#C2681F", stroke_width=0.8, opacity=0.75, clip_path=kd))
-    # sırt yüzgeci ışınları
+        e.append(_el("circle", cx=50 - i * 0.7, cy=85 + i * 4.7, r=0.7,
+                     fill="#8F4A14", opacity=0.8))
+    # benekler (açık/koyu)
+    for sx, sy, sr, renk, op in [(38, 86, 1.3, "#FFD9A0", 0.55), (44, 95, 1.6, "#FFD9A0", 0.5),
+                                 (36, 99, 1.1, "#B05E1C", 0.45), (46, 88, 0.9, "#B05E1C", 0.4),
+                                 (40, 105, 1.2, "#FFD9A0", 0.5), (34, 92, 0.8, "#FFD9A0", 0.5)]:
+        e.append(_el("circle", cx=sx, cy=sy, r=sr, fill=renk, opacity=f"{op}"))
+    # sırt yüzgeci: yarı saydam + ışınlar
     e.append(_el("path", d="M 47.5 84 Q 55 88 52.5 97.5 Q 47.5 94 46 90 Z",
-                 fill="#FFDFA0", clip_path=kd, opacity=0.95))
-    e.append(_el("path", d="M 49.5 86 L 52.5 88.5 M 49 89.5 L 52 92 M 48.8 93 L 51.5 95",
-                 stroke="#E0912E", stroke_width=0.7, opacity=0.9, fill="none",
-                 clip_path=kd))
-    # taç + göz + burun
+                 fill="#FFE3B0", clip_path=kd, opacity=0.8))
+    e.append(_el("path", d="M 49.3 85.8 L 52.8 88.3 M 48.8 89 L 52.3 91.8 M 48.5 92.4 "
+                           "L 51.8 95.2", stroke="#D98A2A", stroke_width=0.55,
+                 opacity=0.9, fill="none", clip_path=kd))
+    # taç + baş detayları
     e.append(_el("path", d="M 33.5 68.5 L 37.5 65.5 L 40 69 L 36.5 71.5 Z",
-                 fill="#FFDFA0", clip_path=kd, opacity=0.95))
-    e.append(_el("circle", cx=36.5, cy=78, r=2.0, fill="#12242F"))
-    e.append(_el("circle", cx=37.1, cy=77.4, r=0.65, fill="#FFFFFF", opacity=0.9))
-    e.append(_el("path", d="M 24 73.8 L 31 74.6", stroke="#C2681F", stroke_width=0.8,
-                 fill="none", opacity=0.8))
-    # kuyruk kıvrım çizgisi
+                 fill="#FFDFA0", clip_path=kd, opacity=0.9))
+    e.append(_el("path", d="M 34.5 69.5 L 38.5 66.8", stroke="#B05E1C",
+                 stroke_width=0.5, opacity=0.8, fill="none"))
+    # boru burun (iki çizgi) + yanak dikeni
+    e.append(_el("path", d="M 23.5 73.2 L 31 74.2 M 23.5 76 L 30.5 76.4",
+                 stroke="#B05E1C", stroke_width=0.6, fill="none", opacity=0.85))
+    e.append(_el("circle", cx=40.5, cy=83.5, r=0.8, fill="#8F4A14", opacity=0.8))
+    # göz: iris + bebek + parlama
+    e.append(_el("circle", cx=36.5, cy=78, r=2.4, fill="#C2681F"))
+    e.append(_el("circle", cx=36.5, cy=78, r=2.4, fill="none", stroke="#8F4A14",
+                 stroke_width=0.4))
+    e.append(_el("circle", cx=36.8, cy=78.2, r=1.3, fill="#12181E"))
+    e.append(_el("circle", cx=37.3, cy=77.5, r=0.45, fill="#FFF2D8", opacity=0.95))
+    # kuyruk kıvrım halkaları
     e.append(_el("path", d="M 42.5 103 C 39.5 108 40 112 45 114.5 C 49.5 116 51.5 113 "
-                           "50 110.5", fill="none", stroke="#C2681F", stroke_width=0.9,
+                           "50 110.5", fill="none", stroke="#B05E1C", stroke_width=0.8,
                  opacity=0.8, clip_path=kd))
-    hacim(e, "kati", d, 0.12)
+    for tx, ty, ta in [(41.5, 105.5, 25), (42.5, 109.5, 5), (45.5, 112.5, -25),
+                       (48.8, 112.8, -60)]:
+        e.append(f'<g transform="rotate({ta} {tx} {ty})">'
+                 f'<line x1="{tx - 2.6}" y1="{ty}" x2="{tx + 2.6}" y2="{ty}" '
+                 f'stroke="#B05E1C" stroke-width="0.55" opacity="0.75"/></g>')
+    hacim(e, "kati", d, 0.11)
     e.append("</g>")
 
-    # ---------- KAPLUMBAĞA
+    # ---------- KAPLUMBAĞA (yeşil deniz kaplumbağası)
     k = P["kaplumbaga"]
     kk = _klip(e, "kkaplumbaga", k)
-    e.append(_el("path", d=yol_svg(k), fill="#A8C87A"))
-    # kabuk
+    e.append(_el("path", d=yol_svg(k), fill="#AEC183"))
+    # deri: retiküle pul dokusu (baş + yüzgeçler)
+    for sx, sy, sr in [(98, 74.5, 1.6), (102.5, 72.5, 1.4), (106.5, 75, 1.5),
+                       (100, 78.5, 1.3), (104.5, 78, 1.2), (99, 82, 1.1),
+                       (119, 61.5, 1.3), (124.5, 63, 1.2), (129, 65.5, 1.1),
+                       (120, 108, 1.4), (126, 110, 1.2), (132, 111, 1.1),
+                       (166, 100, 1.2), (171, 103, 1.1), (175, 105.5, 0.9)]:
+        e.append(_el("circle", cx=sx, cy=sy, r=sr, fill="none", stroke="#6E8A48",
+                     stroke_width=0.5, opacity=0.75))
+    e.append(_el("path", d="M 112 104 Q 122 100 132 103 M 116 108.5 Q 124 105 133 107.5",
+                 fill="none", stroke="#6E8A48", stroke_width=0.5, opacity=0.7,
+                 clip_path=kk))
+    # kabuk tabanı + plakalar (scute'lar, büyüme halkalı)
     e.append(_el("ellipse", cx=140, cy=84, rx=33, ry=21.5, fill="url(#kabukg)"))
-    e.append(_el("ellipse", cx=140, cy=84, rx=33, ry=21.5, fill="none", stroke="#2F5228",
-                 stroke_width=1.0, opacity=0.8))
-    # kabuk plakaları (altıgen deseni)
-    e.append(_el("path", d="M 128 68 L 143 66.5 L 152 74 L 149 84 L 134 85.5 L 125 78 Z",
-                 fill="none", stroke="#2F5228", stroke_width=0.9, opacity=0.85,
-                 clip_path=kk))
-    e.append(_el("path", d="M 152 74 L 163 73 L 169 80 L 166 89 L 149 84 M 149 84 "
-                           "L 146 95 L 131 96 L 134 85.5 M 125 78 L 114 80 L 111 88 "
-                           "L 117 94 L 131 96 M 143 66.5 L 145 63 M 163 73 L 167 70",
-                 fill="none", stroke="#2F5228", stroke_width=0.8, opacity=0.75,
-                 clip_path=kk))
-    # kabuk kenar bordürü
+    e.append(_el("ellipse", cx=140, cy=84, rx=33, ry=21.5, fill="none",
+                 stroke="#2B4A22", stroke_width=1.0, opacity=0.9))
+    for pts, ton in [("128,68 143,66.5 152,74 149,84 134,85.5 125,78", "#61914A"),
+                     ("152,74 163,73 169,80 166,89 149,84", "#557F3D"),
+                     ("149,84 146,95 131,96 134,85.5", "#4E7838"),
+                     ("125,78 114,80 111,88 117,94 131,96 134,85.5", "#587F41"),
+                     ("143,66.5 145,63.5 158,63.5 163,73 152,74", "#4E7838")]:
+        e.append(_el("polygon", points=pts, fill=ton, opacity=0.9, clip_path=kk))
+        e.append(_el("polygon", points=pts, fill="none", stroke="#2B4A22",
+                     stroke_width=0.85, opacity=0.9, clip_path=kk))
+    # büyüme halkaları (iki büyük plakada)
+    e.append(_el("polygon", points="131.5,71 141.5,70 147.5,75.5 145.5,81.5 136,82.5 130,77.5",
+                 fill="none", stroke="#7FA35C", stroke_width=0.5, opacity=0.7))
+    e.append(_el("polygon", points="154,76.5 161.5,75.8 165.5,80.5 163.5,86 152.5,82.5",
+                 fill="none", stroke="#7FA35C", stroke_width=0.5, opacity=0.65))
+    # kenar plakaları (marjinal dişler)
+    for aa in range(-160, 181, 24):
+        ar = math.radians(aa)
+        e.append(_el("line", x1=140 + 30.4 * math.cos(ar), y1=84 + 19.6 * math.sin(ar),
+                     x2=140 + 33 * math.cos(ar), y2=84 + 21.5 * math.sin(ar),
+                     stroke="#2B4A22", stroke_width=0.6, opacity=0.85))
     e.append(_el("path", d="M 108 88 A 33 21.5 0 0 0 172 88 L 172 92 A 33 21.5 0 0 1 "
-                           "108 92 Z", fill="#E8D8A0", clip_path=kk, opacity=0.9))
-    # baş + benekler + göz + ağız
-    for sx, sy, sr in [(99, 75, 1.0), (104, 73.5, 0.8), (101, 80, 0.8), (106, 78, 0.7),
-                       (120, 62, 0.8), (126, 64.5, 0.7), (124, 107, 0.8), (130, 109, 0.7),
-                       (168, 99, 0.8), (172, 102, 0.65)]:
-        e.append(_el("circle", cx=sx, cy=sy, r=sr, fill="#5E8A3C", opacity=0.85))
-    e.append(_el("circle", cx=97.5, cy=76.5, r=1.9, fill="#12242F"))
-    e.append(_el("circle", cx=98.1, cy=75.9, r=0.6, fill="#FFFFFF", opacity=0.9))
-    e.append(_el("path", d="M 93.5 80.5 Q 96.5 82.5 100 81.5", fill="none",
-                 stroke="#12242F", stroke_width=0.7, opacity=0.8))
-    hacim(e, "kkaplumbaga", k, 0.11)
+                           "108 92 Z", fill="#E4D49C", clip_path=kk, opacity=0.9))
+    # göz (badem) + gaga ağız
+    e.append(_el("ellipse", cx=97.8, cy=76.5, rx=2.0, ry=1.7, fill="#F0EAD8"))
+    e.append(_el("circle", cx=98.1, cy=76.7, r=1.25, fill="#3A2A18"))
+    e.append(_el("circle", cx=98.5, cy=76.2, r=0.4, fill="#FFF6E0", opacity=0.95))
+    e.append(_el("path", d="M 96 74.9 A 2.6 2.6 0 0 1 100 74.8", fill="none",
+                 stroke="#6E8A48", stroke_width=0.5, opacity=0.9))
+    e.append(_el("path", d="M 92.8 79.8 Q 96.5 81.6 100.5 80.8 M 93.4 81.8 L 94.6 83.6",
+                 fill="none", stroke="#4E5E30", stroke_width=0.65, opacity=0.9))
+    # yüzgeç kenar gölgesi
+    e.append(_el("path", d="M 112 108 Q 124 114 137 110", fill="none", stroke="#7E9A56",
+                 stroke_width=1.4, opacity=0.6, clip_path=kk))
+    hacim(e, "kkaplumbaga", k, 0.10)
 
-    # ---------- BALIK (palyaço)
+    # ---------- BALIK (palyaço: üç beyaz bant, siyah kenarlar)
     b = P["balik"]
     kb = _klip(e, "kbalik", b)
     e.append(_el("path", d=yol_svg(b), fill="url(#baligg)"))
-    # beyaz bantlar (siyah kenarlı)
-    for bx, gen in [(237, 7.5), (255, 8.5)]:
-        e.append(_el("path", d=f"M {bx-gen/2} 66 C {bx-gen/2-1.5} 80 {bx-gen/2-1.5} 92 "
-                               f"{bx-gen/2} 104 L {bx+gen/2} 104 C {bx+gen/2+1.5} 92 "
-                               f"{bx+gen/2+1.5} 80 {bx+gen/2} 66 Z", fill="#F7F3EA",
-                     clip_path=kb))
-        for kx in (bx - gen / 2, bx + gen / 2):
-            e.append(_el("path", d=f"M {kx} 66 C {kx-1.5} 80 {kx-1.5} 92 {kx} 104",
-                         fill="none", stroke="#1E2A33", stroke_width=0.8, opacity=0.85,
-                         clip_path=kb))
-    # kuyruk/yüzgeç kenarları
-    e.append(_el("path", d="M 270 86 L 284 71 L 284 101 Z", fill="none",
-                 stroke="#1E2A33", stroke_width=1.2, opacity=0.75, clip_path=kb))
-    e.append(_el("path", d="M 276 78 L 276 94", fill="none", stroke="#C2531E",
-                 stroke_width=0.8, opacity=0.7, clip_path=kb))
-    e.append(_el("path", d="M 237 69.5 L 256 68 L 251 77 L 239 77 Z", fill="none",
-                 stroke="#1E2A33", stroke_width=1.0, opacity=0.7, clip_path=kb))
-    # göz + dudak + parlama
-    e.append(_el("circle", cx=232, cy=81, r=2.6, fill="#F7F3EA"))
-    e.append(_el("circle", cx=232.4, cy=81.3, r=1.7, fill="#12242F"))
-    e.append(_el("circle", cx=233, cy=80.6, r=0.55, fill="#FFFFFF", opacity=0.9))
-    e.append(_el("path", d="M 223.5 84.5 Q 225.5 86.5 228 85.8", fill="none",
-                 stroke="#8C3A16", stroke_width=0.7, opacity=0.8))
-    e.append(_el("path", d="M 234 72 C 244 69.5 256 70 264 74", fill="none",
-                 stroke="#FFD9A8", stroke_width=1.4, opacity=0.6, clip_path=kb))
-    hacim(e, "kbalik", b, 0.12)
+    # sırt koyulaşması
+    e.append(_el("path", d="M 226 80 C 238 68 262 66 272 78 L 272 70 L 226 70 Z",
+                 fill="#C7480F", opacity=0.65, clip_path=kb))
+    # baş bandı
+    e.append(_el("path", d="M 235.2 70 C 233.4 76 233.2 88 235 100.5 L 240.4 99.5 "
+                           "C 238.8 88 239 76 240.6 69 Z", fill="#F5F1E6", clip_path=kb))
+    for dpath in ("M 235.2 70 C 233.4 76 233.2 88 235 100.5",
+                  "M 240.6 69 C 239 76 238.8 88 240.4 99.5"):
+        e.append(_el("path", d=dpath, fill="none", stroke="#141B20",
+                     stroke_width=1.0, opacity=0.9, clip_path=kb))
+    # orta bant (öne çıkıntılı — palyaço imzası)
+    e.append(_el("path", d="M 252.5 67 C 249 73 246.6 80 246.4 85 C 246.6 90 249 97.5 "
+                           "252.5 103.5 L 260 103 C 258.2 95 258.2 76 260 67.5 Z",
+                 fill="#F5F1E6", clip_path=kb))
+    for dpath in ("M 252.5 67 C 249 73 246.6 80 246.4 85 C 246.6 90 249 97.5 252.5 103.5",
+                  "M 260 67.5 C 258.2 76 258.2 95 260 103"):
+        e.append(_el("path", d=dpath, fill="none", stroke="#141B20",
+                     stroke_width=1.0, opacity=0.9, clip_path=kb))
+    # kuyruk bandı
+    e.append(_el("path", d="M 268.2 73 C 266.8 80 266.8 92 268.2 99 L 272 96.5 "
+                           "C 271 90 271 82 272 75.5 Z", fill="#F5F1E6", clip_path=kb))
+    e.append(_el("path", d="M 268.2 73 C 266.8 80 266.8 92 268.2 99 M 272 75.5 "
+                           "C 271 82 271 90 272 96.5", fill="none", stroke="#141B20",
+                 stroke_width=0.9, opacity=0.85, clip_path=kb))
+    # yüzgeç kenarları: siyah şerit + ışınlar
+    e.append(_el("path", d="M 237.5 70.5 L 255 69 M 239.5 76.5 L 250.5 76", fill="none",
+                 stroke="#141B20", stroke_width=1.1, opacity=0.8, clip_path=kb))
+    e.append(_el("path", d="M 241 70.3 L 242 75.8 M 245 69.9 L 245.8 75.9 M 249 69.6 "
+                           "L 249.5 76", stroke="#C7480F", stroke_width=0.45,
+                 opacity=0.8, fill="none", clip_path=kb))
+    e.append(_el("path", d="M 283.5 72.5 A 34 34 0 0 1 283.5 99.5", fill="none",
+                 stroke="#141B20", stroke_width=1.4, opacity=0.85, clip_path=kb))
+    for ty in (76, 82, 88, 94):
+        e.append(_el("line", x1=272.5, y1=86 + (ty - 86) * 0.55, x2=283, y2=ty,
+                     stroke="#C7480F", stroke_width=0.5, opacity=0.75, clip_path=kb))
+    # karın/anal yüzgeç kenarları
+    e.append(_el("path", d="M 238.5 101.5 Q 244 104.5 250 101.8 M 254.5 100.5 "
+                           "Q 259.5 102.5 264 99.5", fill="none", stroke="#141B20",
+                 stroke_width=0.9, opacity=0.75, clip_path=kb))
+    # göğüs yüzgeci (gövde üstünde)
+    e.append(f'<g transform="rotate(-22 243.5 90.5)">'
+             f'<ellipse cx="243.5" cy="90.5" rx="5.6" ry="3.1" fill="#F2884B" '
+             f'opacity="0.9"/><ellipse cx="243.5" cy="90.5" rx="5.6" ry="3.1" '
+             f'fill="none" stroke="#141B20" stroke-width="0.6" opacity="0.7"/></g>')
+    e.append(_el("path", d="M 239 90.8 L 247.5 89.6 M 239.5 92.3 L 247.5 91.4",
+                 stroke="#C7480F", stroke_width=0.4, opacity=0.7, fill="none"))
+    # solungaç kapağı + göz + dudak
+    e.append(_el("path", d="M 234.5 78 Q 236.8 86 234.8 95", fill="none",
+                 stroke="#C7480F", stroke_width=0.6, opacity=0.7, clip_path=kb))
+    e.append(_el("circle", cx=230.8, cy=81, r=2.5, fill="#E8DFC8"))
+    e.append(_el("circle", cx=231.1, cy=81.2, r=1.75, fill="#C2581E"))
+    e.append(_el("circle", cx=231.3, cy=81.4, r=1.0, fill="#101418"))
+    e.append(_el("circle", cx=231.8, cy=80.6, r=0.4, fill="#FFF6E0", opacity=0.95))
+    e.append(_el("path", d="M 223.3 84.6 Q 225.6 86.4 228.2 85.6", fill="none",
+                 stroke="#8C3A16", stroke_width=0.7, opacity=0.85))
+    e.append(_el("path", d="M 223 87.4 Q 225.5 88.6 228 87.9", fill="none",
+                 stroke="#8C3A16", stroke_width=0.5, opacity=0.6))
+    hacim(e, "kbalik", b, 0.11)
 
-    # ---------- AHTAPOT (detaylar yerel koordinatta, grupla taşınır)
+    # ---------- AHTAPOT (kızıl-kahve, vantuzlu, yatay göz bebekli)
     o = s_tasi(P["ahtapot"], 0, -1.5)
     e.append('<g transform="translate(0,1.5)">')
     ko = _klip(e, "kahtapot", o)
     e.append(_el("path", d=yol_svg(o), fill="url(#ahtapotg)"))
-    # kol vantuzları
-    for vx, vy in [(31, 158), (28, 162.5), (45.5, 161), (45, 165.5), (70.5, 161),
-                   (71, 165.5), (85, 158), (88, 162.5), (37, 153.5), (79, 153.5)]:
-        e.append(_el("circle", cx=vx, cy=vy, r=1.15, fill="#E3C2EE", opacity=0.9))
-        e.append(_el("circle", cx=vx, cy=vy, r=0.5, fill="#B98CD1", opacity=0.9))
-    # kafa benekleri
-    for sx, sy, sr in [(48, 130, 1.2), (56, 126.5, 1.0), (66, 129, 1.2), (61, 134, 0.8),
-                       (51, 137, 0.8)]:
-        e.append(_el("circle", cx=sx, cy=sy, r=sr, fill="#D8A8E8", opacity=0.8))
-    # gözler + gülümseme + yanaklar
+    # benekli deri dokusu
+    for sx, sy, sr, renk, op in [(46, 128, 1.8, "#8F4128", 0.5), (58, 124.5, 1.5, "#8F4128", 0.45),
+                                 (68, 129, 1.7, "#8F4128", 0.5), (52, 134, 1.2, "#E0A583", 0.5),
+                                 (63, 133.5, 1.3, "#E0A583", 0.45), (40, 137, 1.1, "#8F4128", 0.4),
+                                 (74, 138, 1.2, "#8F4128", 0.45), (57, 139, 1.0, "#E0A583", 0.4),
+                                 (34, 148, 1.1, "#8F4128", 0.4), (81, 148.5, 1.1, "#8F4128", 0.4),
+                                 (47, 121.5, 0.9, "#E0A583", 0.45), (66, 121, 0.9, "#8F4128", 0.4)]:
+        e.append(_el("circle", cx=sx, cy=sy, r=sr, fill=renk, opacity=f"{op}"))
+    # kol araları perde gölgesi
+    e.append(_el("path", d="M 36 152 Q 47 156 47 163 M 58 158 Q 58 162 58 165 "
+                           "M 69 163 Q 69 158 80 152", fill="none", stroke="#6E3320",
+                 stroke_width=1.2, opacity=0.45, clip_path=ko))
+    # sifon (huni)
+    e.append(f'<g transform="rotate(-24 42 150.5)">'
+             f'<rect x="39" y="149" width="6" height="2.8" rx="1.4" fill="#8F4128" '
+             f'opacity="0.9"/></g>')
+    e.append(_el("ellipse", cx=39.2, cy=151.6, rx=1.0, ry=0.7, fill="#4E2010",
+                 opacity=0.9))
+    # gözler: kabarık kapak + altın iris + yatay bebek
     for gx in (49.5, 66.5):
-        e.append(_el("circle", cx=gx, cy=143.5, r=3.6, fill="#F7F3EA"))
-        e.append(_el("circle", cx=gx + 0.5, cy=144, r=2.2, fill="#12242F"))
-        e.append(_el("circle", cx=gx + 1.2, cy=143.2, r=0.7, fill="#FFFFFF",
+        e.append(_el("path", d=f"M {gx - 3.4} 142.2 A 3.6 3.6 0 0 1 {gx + 3.4} 142.2",
+                     fill="none", stroke="#6E3320", stroke_width=0.8, opacity=0.7))
+        e.append(_el("ellipse", cx=gx, cy=143.8, rx=2.9, ry=2.5, fill="#D8B25E"))
+        e.append(_el("ellipse", cx=gx, cy=143.8, rx=2.9, ry=2.5, fill="none",
+                     stroke="#6E3320", stroke_width=0.5, opacity=0.8))
+        e.append(_el("rect", x=gx - 1.9, y=143.2, width=3.8, height=1.3, rx=0.65,
+                     fill="#14100C"))
+        e.append(_el("circle", cx=gx - 0.9, cy=142.6, r=0.4, fill="#FFF2D8",
                      opacity=0.9))
-    e.append(_el("path", d="M 54 150.5 Q 58 153.5 62 150.5", fill="none",
-                 stroke="#4E2668", stroke_width=1.0, opacity=0.9))
-    e.append(_el("ellipse", cx=43.5, cy=148, rx=2.2, ry=1.3, fill="#E88BB0",
-                 opacity=0.55))
-    e.append(_el("ellipse", cx=72.5, cy=148, rx=2.2, ry=1.3, fill="#E88BB0",
-                 opacity=0.55))
-    hacim(e, "kahtapot", o, 0.11)
+    # kol vantuz sıraları
+    vantuzlar = [
+        (35.2, 155, 1.15), (32.2, 158, 1.05), (29.4, 161, 0.95), (27.3, 163.6, 0.85),
+        (47.8, 159.5, 1.05), (46.6, 162.5, 0.95), (45.6, 165.3, 0.85),
+        (68.2, 159.5, 1.05), (69.4, 162.5, 0.95), (70.4, 165.3, 0.85),
+        (80.8, 155, 1.15), (83.8, 158, 1.05), (86.6, 161, 0.95), (88.7, 163.6, 0.85),
+    ]
+    for vx, vy, vr in vantuzlar:
+        e.append(_el("circle", cx=vx, cy=vy, r=vr, fill="#E8C4B0", opacity=0.95))
+        e.append(_el("circle", cx=vx, cy=vy, r=vr * 0.45, fill="#9C4A2E"))
+    # manto kıvrımı
+    e.append(_el("path", d="M 40 130 Q 58 122 76 130", fill="none", stroke="#B06A4A",
+                 stroke_width=0.8, opacity=0.5, clip_path=ko))
+    hacim(e, "kahtapot", o, 0.10)
     e.append("</g>")
 
-    # ---------- YENGEÇ
+    # ---------- YENGEÇ (granül kabuk, kıskaç parmakları)
     yc = P["yengec"]
     kyc = _klip(e, "kyengec", yc)
     e.append(_el("path", d=yol_svg(yc), fill="url(#yengecg)"))
-    # kabuk benekleri + alt kenar
-    for sx, sy in [(152, 146), (162, 143), (172, 146.5), (157, 151), (168, 151.5)]:
-        e.append(_el("circle", cx=sx, cy=sy, r=0.9, fill="#FFB59C", opacity=0.8))
-    e.append(_el("path", d="M 141 156 Q 163 163 185 156", fill="none", stroke="#8C2416",
-                 stroke_width=0.9, opacity=0.7, clip_path=kyc))
-    # kıskaç eklem çizgileri
-    e.append(_el("path", d="M 143.5 141.5 L 149.5 145.5 M 182.5 141.5 L 176.5 145.5",
-                 stroke="#8C2416", stroke_width=0.8, fill="none", opacity=0.8,
+    # kabuk granülleri
+    for sx, sy, sr in [(150, 145, 0.7), (156, 142.5, 0.6), (163, 141.5, 0.7),
+                       (170, 142.5, 0.6), (176, 145, 0.7), (153, 148.5, 0.55),
+                       (160, 147, 0.6), (167, 147.5, 0.6), (173, 149, 0.55),
+                       (149, 152, 0.5), (157, 152.5, 0.55), (165, 153, 0.55),
+                       (172, 153, 0.5), (161, 156.5, 0.5), (168, 157, 0.45)]:
+        e.append(_el("circle", cx=sx, cy=sy, r=sr, fill="#8F2717", opacity=0.55))
+        e.append(_el("circle", cx=sx - 0.25, cy=sy - 0.25, r=sr * 0.4,
+                     fill="#FF9E7A", opacity=0.6))
+    # kabuk ön dişleri + yan kenar
+    e.append(_el("path", d="M 152 138.5 L 154 136.8 L 156 138.2 M 170 138.2 L 172 136.8 "
+                           "L 174 138.5", fill="none", stroke="#8F2717",
+                 stroke_width=0.6, opacity=0.8, clip_path=kyc))
+    e.append(_el("path", d="M 141 145 Q 140 150 142.5 155 M 185 145 Q 186 150 183.5 155",
+                 fill="none", stroke="#8F2717", stroke_width=0.7, opacity=0.7,
                  clip_path=kyc))
-    e.append(_el("path", d="M 133.5 134 L 138 139.5 M 192.5 134 L 188 139.5",
-                 stroke="#8C2416", stroke_width=0.7, fill="none", opacity=0.7,
+    e.append(_el("path", d="M 143 157.5 Q 163 164.5 183 157.5", fill="none",
+                 stroke="#7C2012", stroke_width=1.0, opacity=0.75, clip_path=kyc))
+    # kıskaçlar: parmak ayrımı + koyu uçlar + eklem
+    e.append(_el("path", d="M 134.5 133.5 L 139.5 139.5 M 191.5 133.5 L 186.5 139.5",
+                 stroke="#5E170D", stroke_width=0.9, fill="none", opacity=0.9,
                  clip_path=kyc))
-    # gözler
+    e.append(_el("path", d="M 131.5 133.8 Q 134 130.5 137.5 131.6 L 135.5 135.5 Z",
+                 fill="#7C2012", opacity=0.8, clip_path=kyc))
+    e.append(_el("path", d="M 194.5 133.8 Q 192 130.5 188.5 131.6 L 190.5 135.5 Z",
+                 fill="#7C2012", opacity=0.8, clip_path=kyc))
+    e.append(_el("path", d="M 143.5 141.5 Q 146 144.5 149.5 145.8 M 182.5 141.5 "
+                           "Q 180 144.5 176.5 145.8", stroke="#8F2717",
+                 stroke_width=0.7, fill="none", opacity=0.8, clip_path=kyc))
+    # gözler: kısa sapta küçük boncuk
     for gx in (157.7, 168.3):
-        e.append(_el("circle", cx=gx, cy=130.5, r=2.2, fill="#F7F3EA"))
-        e.append(_el("circle", cx=gx + 0.3, cy=130.8, r=1.3, fill="#12242F"))
-        e.append(_el("circle", cx=gx + 0.8, cy=130.2, r=0.45, fill="#FFFFFF",
-                     opacity=0.9))
-    # ağız
-    e.append(_el("path", d="M 159.5 138 Q 163 140.5 166.5 138", fill="none",
-                 stroke="#5E170D", stroke_width=0.9, opacity=0.85))
-    # bacak eklemleri
-    e.append(_el("path", d="M 143 164 L 145.5 162.5 M 153 166 L 154.5 164.5 "
-                           "M 173 166 L 171.5 164.5 M 183 164 L 180.5 162.5",
-                 stroke="#8C2416", stroke_width=0.7, fill="none", opacity=0.75,
+        e.append(_el("line", x1=gx, y1=134, x2=gx, y2=131.5, stroke="#8F2717",
+                     stroke_width=0.6, opacity=0.7))
+        e.append(_el("circle", cx=gx + 0.2, cy=130.6, r=1.6, fill="#1A0E0A"))
+        e.append(_el("circle", cx=gx + 0.7, cy=130.1, r=0.45, fill="#FFD9C4",
+                     opacity=0.85))
+    # ağız parçaları (mandibul çizgileri)
+    e.append(_el("path", d="M 161 137.5 L 162.3 139.3 M 165 137.5 L 163.7 139.3",
+                 stroke="#5E170D", stroke_width=0.6, fill="none", opacity=0.8))
+    # bacak eklemleri + uçlar
+    e.append(_el("path", d="M 143.5 163.5 L 146 162 M 152.5 165.5 L 154.5 164 "
+                           "M 173.5 165.5 L 171.5 164 M 182.5 163.5 L 180 162",
+                 stroke="#7C2012", stroke_width=0.7, fill="none", opacity=0.8,
                  clip_path=kyc))
-    hacim(e, "kyengec", yc, 0.12)
+    for tx, ty in [(140, 167), (151.5, 168.2), (174.5, 168.2), (186, 167)]:
+        e.append(_el("circle", cx=tx, cy=ty, r=1.0, fill="#5E170D", opacity=0.6,
+                     clip_path=kyc))
+    hacim(e, "kyengec", yc, 0.11)
 
-    # ---------- DENİZYILDIZI
+    # ---------- DENİZYILDIZI (osikül dokusu, madreporit)
     z = P["denizyildizi"]
     kz = _klip(e, "kyildiz", z)
     e.append(_el("path", d=yol_svg(z), fill="url(#yildizg)"))
-    # merkez + kollara akan çizgiler
-    e.append(_el("circle", cx=261, cy=148, r=6, fill="#FFDFA0", opacity=0.75))
+    # kol sırt çizgileri + osikül sıraları
     for i in range(5):
         aa = math.radians(-90 + i * 72)
         ux, uy = math.cos(aa), math.sin(aa)
-        e.append(_el("line", x1=261 + 4 * ux, y1=149 + 4 * uy, x2=261 + 21 * ux,
-                     y2=149 + 21 * uy, stroke="#C2681F", stroke_width=0.8,
-                     opacity=0.65, clip_path=kz))
-        for t in (9, 14, 19):
-            px_, py_ = 261 + t * ux, 149 + t * uy
-            nx, nyy = -uy, ux
-            for tarafi in (-1, 1):
-                e.append(_el("circle", cx=px_ + nx * 3.2 * tarafi,
-                             cy=py_ + nyy * 3.2 * tarafi, r=0.62, fill="#B85F1E",
-                             opacity=0.75))
-    # göz + gülümseme (sevimli)
-    e.append(_el("circle", cx=257.5, cy=146.5, r=1.5, fill="#12242F"))
-    e.append(_el("circle", cx=264.5, cy=146.5, r=1.5, fill="#12242F"))
-    e.append(_el("circle", cx=258, cy=146, r=0.5, fill="#FFFFFF", opacity=0.9))
-    e.append(_el("circle", cx=265, cy=146, r=0.5, fill="#FFFFFF", opacity=0.9))
-    e.append(_el("path", d="M 258 151 Q 261 153.5 264 151", fill="none",
-                 stroke="#12242F", stroke_width=0.9, opacity=0.9))
-    hacim(e, "kyildiz", z, 0.12)
+        nx, nyy = -uy, ux
+        e.append(_el("line", x1=261 + 3 * ux, y1=149 + 3 * uy, x2=261 + 22 * ux,
+                     y2=149 + 22 * uy, stroke="#8F4A14", stroke_width=0.7,
+                     opacity=0.55, clip_path=kz))
+        for t in (7, 11, 15, 19):
+            e.append(_el("circle", cx=261 + t * ux, cy=149 + t * uy, r=0.85,
+                         fill="#B85F1E", opacity=0.85))
+        for t in (9, 13, 17):
+            for taraf in (-1, 1):
+                e.append(_el("circle", cx=261 + t * ux + nx * 2.8 * taraf,
+                             cy=149 + t * uy + nyy * 2.8 * taraf, r=0.55,
+                             fill="#A85518", opacity=0.8))
+        for t in (8, 12, 16, 20):
+            for taraf in (-1, 1):
+                e.append(_el("circle", cx=261 + t * ux + nx * 1.5 * taraf,
+                             cy=149 + t * uy + nyy * 1.5 * taraf, r=0.4,
+                             fill="#FFD9A0", opacity=0.55))
+        # kol arası kıvrım gölgesi
+        ca = math.radians(-54 + i * 72)
+        e.append(_el("path", d=f"M 261 149 L {261 + 9 * math.cos(ca - 0.22):.1f} "
+                               f"{149 + 9 * math.sin(ca - 0.22):.1f} "
+                               f"L {261 + 9 * math.cos(ca + 0.22):.1f} "
+                               f"{149 + 9 * math.sin(ca + 0.22):.1f} Z",
+                     fill="#8F4A14", opacity=0.3, clip_path=kz))
+    # merkez disk + madreporit
+    for t_ in (2.2, 4.4):
+        e.append(_el("circle", cx=261, cy=149, r=t_, fill="none", stroke="#B85F1E",
+                     stroke_width=0.5, opacity=0.5))
+    e.append(_el("circle", cx=264, cy=145.6, r=1.15, fill="#E8D0A0"))
+    e.append(_el("circle", cx=264, cy=145.6, r=1.15, fill="none", stroke="#A85518",
+                 stroke_width=0.4, opacity=0.9))
+    e.append(_el("path", d="M 263.4 145.6 L 264.6 145.6 M 264 145 L 264 146.2",
+                 stroke="#A85518", stroke_width=0.3, opacity=0.8))
+    hacim(e, "kyildiz", z, 0.11)
 
     return e
 
