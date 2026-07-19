@@ -28,9 +28,10 @@ Beyaz mürekkep dosyası kullanılmıyor. Gölge siluetleri 0,4 mm içeri alınm
 
 ### Baskı içeriği
 
-- Her parçanın yanında **Türkçe • İngilizce** ad plakası (YUNUS • DOLPHIN, DENİZANASI • JELLYFISH, DENİZATI • SEAHORSE, KAPLUMBAĞA • SEA TURTLE, BALIK • FISH, AHTAPOT • OCTOPUS, YENGEÇ • CRAB, DENİZYILDIZI • STARFISH). Konumlar parmak yuvalarıyla çakışmaz.
+- Çizim stili: masal kitabı (kalın koyu konturlar, iri parlak gözler, gülen yüzler, doygun renkler).
+- Her parçanın yanında **Türkçe / İngilizce** ad plakası (İngilizce mavi renkte): Yunus / Dolphin, Denizanası / Jellyfish, Denizatı / Seahorse, Kaplumbağa / Sea Turtle, Balık / Fish, Ahtapot / Octopus, Yengeç / Crab, Denizyıldızı / Starfish. Konumlar parmak yuvalarıyla çakışmaz.
 - Sağ üst köşede **zoziva** logosu (`varlik/zoziva_logo.png`).
-- Dekor: su yüzeyi, ışık hüzmeleri, kabarcıklar, balık sürüleri, kumlu taban, yosunlar, mercan, kayalar, deniz kabukları.
+- Dekor: su yüzeyi, ışık hüzmeleri, çerçeveli kabarcıklar, kumlu taban, renkli mercanlar (mor/pembe dallı), sarı tüp süngerler, yosunlar, kayalar, tarak/salyangoz kabukları, mini denizyıldızı.
 
 ## Üretim notları
 
