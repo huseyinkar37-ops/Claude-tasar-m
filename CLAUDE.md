@@ -19,16 +19,17 @@ Known facts:
 temalar/
   araclar/            # Tema 01 — vehicles (8 pieces across sky / land / sea bands)
   deniz_canlilari/    # Tema 02 — sea creatures (8 pieces across depth bands)
+  is_makineleri/      # Tema 03 — construction machines (8 pieces across dig / haul / road bands)
     olustur.py        # self-contained generator for the theme
     README.md         # Turkish production notes for the theme
     varlik/           # brand assets (zoziva_logo.png, transparent PNG)
     cikti/            # generated output — PDFs, DXF, preview PNGs (committed)
 ```
 
-Both themes share the same script skeleton (see Architecture); they differ in how piece contours are produced, the theme-specific detail/decor helpers, and drawing style. `araclar` is the original template. `deniz_canlilari` introduced a `TEMA = "..."` constant so output filenames derive from one place — prefer that pattern for new themes over the hardcoded filenames still in `araclar`.
+All themes share the same script skeleton (see Architecture); they differ in how piece contours are produced, the theme-specific detail/decor helpers, and drawing style. `araclar` is the original template. `deniz_canlilari` and `is_makineleri` use a `TEMA = "..."` constant so output filenames derive from one place — prefer that pattern for new themes over the hardcoded filenames still in `araclar`.
 
 Two ways a theme can define its pieces:
-- **Vector-drawn** (`araclar`): each `kontur_*()` composes shapely primitives; printed detail is hand-drawn vector art. Deps: `ezdxf cairosvg shapely`.
+- **Vector-drawn** (`araclar`, `is_makineleri`): each `kontur_*()` composes shapely primitives; printed detail is hand-drawn vector art. Deps: `ezdxf cairosvg shapely`. `is_makineleri` uses a `YERLESIM` table `(name, cx, cy, class, kontur_fn)` and draws each machine relative to its own `(cx, cy)` center, so pieces move by editing the table.
 - **Image-silhouette + vector trace** (`deniz_canlilari`): each piece comes from a reference PNG in `varlik/<piece>.png`. `goruntu_cikar()` keys out the border-connected white background (interior whites preserved), traces the silhouette to ONE chunky closed contour (morphological close thickens thin protrusions for wood strength), then **color-traces the image to vector** (`K_RENK`-color quantize → per-color region paths, darkest palette entry drawn last as the outline) placed in the same frame and clipped to that contour — so the print is pure vector and still derives from the one cut polygon. Placement/size/thickening live in a `YERLESIM` table `(name, cx, cy, height_mm, kapa, ac, class)`. Extra deps: `pillow numpy scikit-image scipy`. To restyle a creature, swap its PNG and rerun.
 
 ## Communication
