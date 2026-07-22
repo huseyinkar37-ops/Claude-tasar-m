@@ -29,7 +29,7 @@ Both themes share the same script skeleton (see Architecture); they differ in ho
 
 Two ways a theme can define its pieces:
 - **Vector-drawn** (`araclar`): each `kontur_*()` composes shapely primitives; printed detail is hand-drawn vector art. Deps: `ezdxf cairosvg shapely`.
-- **Image-silhouette** (`deniz_canlilari`): each piece comes from a reference PNG in `varlik/<piece>.png`. `goruntu_cikar()` keys out the border-connected white background (interior whites preserved), traces the silhouette to ONE chunky closed contour (morphological close thickens thin protrusions for wood strength), and the same image is embedded into the print SVG clipped to that contour — so print and cut still derive from one polygon. Placement/size/thickening live in a `YERLESIM` table `(name, cx, cy, height_mm, kapa, ac, class)`. Extra deps: `pillow numpy scikit-image scipy`. To restyle a creature, swap its PNG and rerun.
+- **Image-silhouette + vector trace** (`deniz_canlilari`): each piece comes from a reference PNG in `varlik/<piece>.png`. `goruntu_cikar()` keys out the border-connected white background (interior whites preserved), traces the silhouette to ONE chunky closed contour (morphological close thickens thin protrusions for wood strength), then **color-traces the image to vector** (`K_RENK`-color quantize → per-color region paths, darkest palette entry drawn last as the outline) placed in the same frame and clipped to that contour — so the print is pure vector and still derives from the one cut polygon. Placement/size/thickening live in a `YERLESIM` table `(name, cx, cy, height_mm, kapa, ac, class)`. Extra deps: `pillow numpy scikit-image scipy`. To restyle a creature, swap its PNG and rerun.
 
 ## Communication
 

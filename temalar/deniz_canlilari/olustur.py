@@ -5,8 +5,9 @@
 Bu tema, parça çizimlerini `varlik/<canli>.png` referans görsellerinden türetir:
 her görselin siluetinden lazer için TEK, tıknaz kapalı kontur çıkarılır (ince
 uzantılar morfolojik kapama ile ahşap dayanımına uygun hale getirilir) ve aynı
-görsel bu kontura hizalı biçimde baskıya gömülür. Böylece baskı ile kesim asla
-ayrışmaz — kontur hem SVG kırpma maskesini hem DXF polikline'ını besler.
+görsel renk kümeleme ile VEKTÖRE çevrilip (color-trace) bu kontura hizalı
+biçimde baskıya çizilir. Böylece baskı ile kesim asla ayrışmaz — kontur hem SVG
+kırpma maskesini hem DXF polikline'ını besler; baskı ise saf vektördür (raster yok).
 
 Çıktılar (cikti/):
   1. deniz_canlilari_uv_kalip.pdf   – UV hizalama kalıbı (yalnız dış çerçeve, 1:1)
@@ -18,7 +19,6 @@ ayrışmaz — kontur hem SVG kırpma maskesini hem DXF polikline'ını besler.
 Bağımlılıklar: ezdxf cairosvg shapely pillow numpy scikit-image scipy
 """
 import base64
-import io
 import math
 import os
 import random
@@ -30,7 +30,7 @@ from scipy import ndimage
 from skimage import measure
 
 from shapely.affinity import scale as s_olcek, translate as s_tasi
-from shapely.geometry import LineString, Point, Polygon, box as s_kutu
+from shapely.geometry import Point, Polygon, box as s_kutu
 from shapely.ops import nearest_points, unary_union
 
 # ---------------------------------------------------------------- temel ölçüler
@@ -61,7 +61,11 @@ def yol_svg(poly):
 def cerceve_poly():
     return s_kutu(CORNER_R, CORNER_R, W - CORNER_R, H - CORNER_R).buffer(CORNER_R, quad_segs=16)
 
-# ---------------------------------------------------------------- görselden kontur
+# ---------------------------------------------------------------- görselden vektör
+K_RENK = 20            # renk kümeleme paleti (color-trace)
+IZ_GEN = 640          # izleme çözünürlüğü (px genişlik)
+
+
 def _arka_plan(rgb):
     """Kenardan bağlı beyaz bölge = arka plan (iç beyazları korur)."""
     beyaz = (rgb[:, :, 0] > 238) & (rgb[:, :, 1] > 238) & (rgb[:, :, 2] > 238)
@@ -71,54 +75,87 @@ def _arka_plan(rgb):
     return np.isin(lab, list(kenar))
 
 
-def goruntu_cikar(ad, cx, cy, hedef_boy, kapa, ac, aci=0.0):
-    """Referans görselden yerleştirilmiş kontur + gömülü görsel verisini döndürür.
+def _yumusat_yol(contour, sv, ox, oy):
+    """px kontur -> yumuşatılmış -> mm SVG 'd' dizesi."""
+    c = measure.approximate_polygon(np.asarray(contour), tolerance=0.9)
+    if len(c) < 4:
+        c = np.asarray(contour)
+    pts = [(col * sv + ox, row * sv + oy) for row, col in c]
+    return (f"M {pts[0][0]:.2f} {pts[0][1]:.2f} "
+            + " ".join(f"L {x:.2f} {y:.2f}" for x, y in pts[1:]) + " Z")
 
-    Döner: (poly_mm, gorsel)  — gorsel = dict(b64, x, y, w, h) mm cinsinden.
+
+def goruntu_cikar(ad, cx, cy, hedef_boy, kapa, ac):
+    """Referans görselden lazer konturu + renkli vektör çizimi türetir.
+
+    Döner: (poly_mm, vektor)
+      poly_mm : lazer/gölge/yuva için tek tıknaz kapalı kontur
+      vektor  : dict(dolgu=[(renk,d),...], kontur=[d,...])  mm uzayında
     """
-    im = Image.open(os.path.join(VARLIK, ad + ".png")).convert("RGB")
-    rgb = np.asarray(im)
-    nesne = ~_arka_plan(rgb)
-    dolu = ndimage.binary_fill_holes(nesne)                     # kontur için iç delikleri kapat
+    im0 = Image.open(os.path.join(VARLIK, ad + ".png")).convert("RGB")
 
+    # --- 1) siluet -> lazer konturu (tam çözünürlük)
+    rgb0 = np.asarray(im0)
+    nesne = ~_arka_plan(rgb0)
+    dolu = ndimage.binary_fill_holes(nesne)
     polis = []
     for c in measure.find_contours(dolu.astype(float), 0.5):
         if len(c) < 20:
             continue
-        p = Polygon([(x, y) for y, x in c])                     # (col=x satır=y)
+        p = Polygon([(x, y) for y, x in c])
         if p.is_valid and p.area > 200:
             polis.append(p)
     if not polis:
         raise RuntimeError("kontur bulunamadı: " + ad)
     birim = unary_union(polis)
-
     ys, _ = np.where(dolu)
-    s = hedef_boy / (ys.max() - ys.min())                       # px -> mm (yükseklik uyumu)
-    birim = s_olcek(birim, s, s, origin=(0, 0))
-    bx0, by0, bx1, by1 = birim.bounds
-    tx, ty = cx - (bx0 + bx1) / 2, cy - (by0 + by1) / 2
-
-    kap = birim.buffer(kapa, quad_segs=12).buffer(-kapa - ac, quad_segs=12).buffer(ac, quad_segs=12)
+    s = hedef_boy / (ys.max() - ys.min())                       # tam-px -> mm
+    birim_s = s_olcek(birim, s, s, origin=(0, 0))
+    bx0, by0, bx1, by1 = birim_s.bounds
+    tx, ty = cx - (bx0 + bx1) / 2, cy - (by0 + by1) / 2         # görsel kökeni -> mm ofseti
+    kap = birim_s.buffer(kapa, quad_segs=12).buffer(-kapa - ac, quad_segs=12).buffer(ac, quad_segs=12)
     if kap.geom_type == "MultiPolygon":
         kap = max(kap.geoms, key=lambda g: g.area)
     poly = s_tasi(Polygon(kap.exterior).simplify(0.15, preserve_topology=True), tx, ty)
-    if aci:
-        from shapely.affinity import rotate as s_dondur
-        poly = s_dondur(poly, aci, origin=(cx, cy))
 
-    # baskıya gömülecek görsel: beyaz zemini şeffaflaştır + boyut küçült
-    rgba = np.dstack([rgb, np.where(nesne, 255, 0).astype(np.uint8)])
-    gim = Image.fromarray(rgba, "RGBA")
-    iw, ih = gim.size
-    w_mm, h_mm = iw * s, ih * s
-    if max(iw, ih) > 900:                                       # dosya boyutu için indir
-        k = 900 / max(iw, ih)
-        gim = gim.resize((round(iw * k), round(ih * k)), Image.LANCZOS)
-    buf = io.BytesIO()
-    gim.save(buf, format="PNG", optimize=True)
-    b64 = base64.b64encode(buf.getvalue()).decode()
-    gorsel = {"b64": b64, "x": tx, "y": ty, "w": w_mm, "h": h_mm, "aci": aci, "cx": cx, "cy": cy}
-    return poly, gorsel
+    # --- 2) color-trace -> renkli vektör (aynı çerçeveye hizalı)
+    k = IZ_GEN / im0.width
+    im = im0.resize((round(im0.width * k), round(im0.height * k)), Image.LANCZOS)
+    arr = ndimage.median_filter(np.asarray(im), size=(3, 3, 1))  # benek temizliği
+    im = Image.fromarray(arr)
+    obj = ndimage.binary_fill_holes(~_arka_plan(arr))
+    sv = s / k                                                  # iz-px -> mm
+
+    pim = im.quantize(colors=K_RENK, method=Image.MAXCOVERAGE, dither=Image.NONE)
+    labels = np.asarray(pim)
+    pal = np.asarray(pim.getpalette()[:K_RENK * 3]).reshape(-1, 3)
+    kontur_renk = int(np.argmin(pal @ [0.299, 0.587, 0.114]))   # en koyu palet = dış çizgi
+
+    dolgu, kontur_yol = [], []
+    for idx in range(K_RENK):
+        m = (labels == idx) & obj
+        if m.sum() < 25:
+            continue
+        if idx == kontur_renk:                                  # dış çizgi: delikli, en üstte
+            mm = ndimage.binary_closing(m, iterations=1)
+            for c in measure.find_contours(mm.astype(float), 0.5):
+                if len(c) >= 12:
+                    kontur_yol.append(_yumusat_yol(c, sv, tx, ty))
+            continue
+        renk = "#{:02X}{:02X}{:02X}".format(*pal[idx])          # renk bölgesi
+        etq, n = ndimage.label(ndimage.binary_fill_holes(m))
+        for li in range(1, n + 1):
+            comp = etq == li
+            if comp.sum() < 40:
+                continue
+            cs = measure.find_contours(ndimage.binary_fill_holes(comp).astype(float), 0.5)
+            if cs:
+                c = max(cs, key=len)
+                if len(c) >= 12:
+                    dolgu.append((comp.sum(), renk, _yumusat_yol(c, sv, tx, ty)))
+    dolgu.sort(key=lambda t: -t[0])                             # büyük alan altta
+    vektor = {"dolgu": [(r, d) for _, r, d in dolgu], "kontur": kontur_yol}
+    return poly, vektor
 
 
 # (ad, cx, cy, hedef_boy_mm, kapa, ac, sınıf) — kapa: kapama yarıçapı (tıknazlaştırma)
@@ -136,7 +173,7 @@ YERLESIM = [
 _cikti = {ad: goruntu_cikar(ad, cx, cy, boy, kapa, ac)
           for ad, cx, cy, boy, kapa, ac, _ in YERLESIM}
 PARCALAR = [(ad, _cikti[ad][0], sinif) for ad, *_, sinif in YERLESIM]
-GORSEL = {ad: _cikti[ad][1] for ad in _cikti}
+VEKTOR = {ad: _cikti[ad][1] for ad in _cikti}
 
 # ---------------------------------------------------------------- parmak yuvaları
 YUVA_R = 5.5
@@ -456,16 +493,18 @@ def sahne_svg(yuva_goster=False):
 
 # ---------------------------------------------------------------- canlı detayları
 def canli_detaylari():
-    """Her canlıyı referans görselinden, kendi konturuna kırpılı biçimde yerleştirir."""
+    """Her canlıyı referansından türetilen renkli VEKTÖR olarak, konturuna kırpılı çizer."""
     e = []
     for ad, poly, _ in PARCALAR:
-        g = GORSEL[ad]
+        v = VEKTOR[ad]
         klip = _klip(e, "k_" + ad, poly)
-        transform = f' transform="rotate({g["aci"]} {g["cx"]} {g["cy"]})"' if g["aci"] else ""
-        e.append(f'<image x="{g["x"]:.3f}" y="{g["y"]:.3f}" width="{g["w"]:.3f}" '
-                 f'height="{g["h"]:.3f}" clip-path="{klip}"{transform} '
-                 f'preserveAspectRatio="none" '
-                 f'xlink:href="data:image/png;base64,{g["b64"]}"/>')
+        e.append(f'<g clip-path="{klip}">')
+        for renk, d in v["dolgu"]:                              # renk bölgeleri (altta)
+            e.append(f'<path d="{d}" fill="{renk}"/>')
+        if v["kontur"]:                                         # dış çizgiler (üstte, delikli)
+            e.append(f'<path d="{" ".join(v["kontur"])}" fill="#1A1E22" '
+                     f'fill-rule="evenodd"/>')
+        e.append("</g>")
     return e
 
 # ---------------------------------------------------------------- SVG belgeleri
