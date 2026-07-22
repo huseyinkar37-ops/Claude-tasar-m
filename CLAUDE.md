@@ -25,7 +25,11 @@ temalar/
     cikti/            # generated output — PDFs, DXF, preview PNGs (committed)
 ```
 
-Both themes share the same script skeleton (see Architecture); they differ in the `kontur_*` piece functions, the theme-specific detail/decor helpers, and drawing style. `araclar` is the original template. `deniz_canlilari` introduced a `TEMA = "..."` constant so output filenames derive from one place — prefer that pattern for new themes over the hardcoded filenames still in `araclar`.
+Both themes share the same script skeleton (see Architecture); they differ in how piece contours are produced, the theme-specific detail/decor helpers, and drawing style. `araclar` is the original template. `deniz_canlilari` introduced a `TEMA = "..."` constant so output filenames derive from one place — prefer that pattern for new themes over the hardcoded filenames still in `araclar`.
+
+Two ways a theme can define its pieces:
+- **Vector-drawn** (`araclar`): each `kontur_*()` composes shapely primitives; printed detail is hand-drawn vector art. Deps: `ezdxf cairosvg shapely`.
+- **Image-silhouette** (`deniz_canlilari`): each piece comes from a reference PNG in `varlik/<piece>.png`. `goruntu_cikar()` keys out the border-connected white background (interior whites preserved), traces the silhouette to ONE chunky closed contour (morphological close thickens thin protrusions for wood strength), and the same image is embedded into the print SVG clipped to that contour — so print and cut still derive from one polygon. Placement/size/thickening live in a `YERLESIM` table `(name, cx, cy, height_mm, kapa, ac, class)`. Extra deps: `pillow numpy scikit-image scipy`. To restyle a creature, swap its PNG and rerun.
 
 ## Communication
 
@@ -35,8 +39,9 @@ Both themes share the same script skeleton (see Architecture); they differ in th
 ## Commands
 
 ```bash
-pip install ezdxf cairosvg shapely  # dependencies (Python 3.11+)
-cd temalar/<tema> && python3 olustur.py   # regenerate all production files into cikti/
+pip install ezdxf cairosvg shapely            # base deps (Python 3.11+)
+pip install pillow numpy scikit-image scipy   # extra deps for image-silhouette themes (deniz_canlilari)
+cd temalar/<tema> && python3 olustur.py        # regenerate all production files into cikti/
 ```
 
 There is no test framework; each generator's `dogrula()` self-validates the layout on every run (piece-to-piece, piece-to-edge, and notch clearances) and prints warnings on violations. Treat those warnings as failures. `main()` prints "Yerleşim doğrulandı" when the layout is clean, then lists each piece's bounding-box size.
