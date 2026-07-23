@@ -25,6 +25,11 @@ Beyaz mürekkep (alt zemin) dosyası bu üretimde **kullanılmıyor** — UV mak
 - `UST_KATMAN_KESIM` (kırmızı): dış çerçeve + 8 araç konturu + **8 parmak yuvası hilali**. Araçları dış çizgisinden keser; parçalar **ve** cepler aynı kesimden çıkar. Hilaller (R 5,5 mm yarım ay, her cebin açık tarafında) ayrı kapalı kesimlerdir: küçük hilal parçası fire olur, cep kenarında parmak yuvası kalır — parça şekli değişmez.
 - `ALT_KATMAN_KESIM` (mavi): düz taban panosu (yalnız dış çerçeve).
 - `YAZI` (gri): etiketler — **kesilmez**, lazer yazılımında kapatın.
+- `HIZA` (sarı): **kesilmez** — baskı↔kesim hizası için dört köşe register haçı. Aynı haçlar baskı ve kalıp PDF'inde de aynı yerdedir (yuvarlatılmış çerçevenin dışında, köşe fire alanında; kesince atılır, oyuncakta görünmez).
+
+### Baskı–kesim hizası (register)
+
+Baskı ile kesimin kaymaması için **dört köşe hiza haçı** kullanılır; aynı koordinatta hem baskıda hem kalıpta hem DXF'in `HIZA` katmanında bulunur. Operatör baskılı tahtayı lazere yerleştirirken bu dört noktayı DXF'teki haçlarla çakıştırır — böylece konum, açı **ve ölçek** tam sabitlenir. Kalıp PDF'i, baskıyla birebir üst üste gelsin diye baskıyla aynı sayfa ölçüsündedir (324 × 184 mm, 2 mm bleed). "Baskı kalıba göre kayık" sorunu neredeyse her zaman baskının yanlış ölçek/konumda basılmasından kaynaklanır (dosya geometrisi zaten tek 320 × 180 tırıma oturur); dört haçtan hizalamak bunu giderir.
 
 ### Marka logosu
 

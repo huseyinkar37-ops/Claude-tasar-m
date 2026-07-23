@@ -1301,20 +1301,40 @@ def svg_belge(w_mm, h_mm, icerik):
             f'viewBox="0 0 {w_mm} {h_mm}">' + "\n".join(icerik) + "</svg>")
 
 
+def hiza_isaretleri(renk="#1A1A1A"):
+    """Dört köşe register (hiza) haçı — yuvarlatılmış çerçevenin DIŞINDA, köşe
+    fire alanında (kesimde atılır, oyuncakta görünmez). Baskı, kalıp ve DXF'te
+    AYNI koordinatta bulunur; operatör baskılı tahtayı kesime bu dört noktadan
+    çakıştırınca konum + açı + ölçek tam sabitlenir (baskı–kesim kayması biter)."""
+    m = []
+    for mx, my in [(5, 5), (W - 5, 5), (5, H - 5), (W - 5, H - 5)]:
+        m.append(_el("line", x1=mx - 3.2, y1=my, x2=mx + 3.2, y2=my, stroke=renk,
+                     stroke_width=0.3))
+        m.append(_el("line", x1=mx, y1=my - 3.2, x2=mx, y2=my + 3.2, stroke=renk,
+                     stroke_width=0.3))
+        m.append(_el("circle", cx=mx, cy=my, r=2.0, fill="none", stroke=renk,
+                     stroke_width=0.3))
+    return m
+
+
 def uret_baski_svg(yuva_goster=False):
     icerik = ([f'<g transform="translate({BLEED},{BLEED})">']
-              + sahne_svg(yuva_goster) + ["</g>"])
+              + sahne_svg(yuva_goster) + hiza_isaretleri() + ["</g>"])
     return svg_belge(W + 2 * BLEED, H + 2 * BLEED, icerik)
 
 
 def uret_kalip_svg():
-    """UV hizalama kalıbı: yalnız dış çerçeve konturu (1:1)."""
-    icerik = [_el("path", d=yol_svg(cerceve_poly()), fill="none", stroke="#FF0000",
+    """UV hizalama kalıbı: dış çerçeve + 4 köşe hiza haçı. Baskıyla BİREBİR
+    çakışsın diye baskıyla aynı sayfa (324x184) ve 2 mm bleed ofseti kullanır."""
+    icerik = [f'<g transform="translate({BLEED},{BLEED})">',
+              _el("path", d=yol_svg(cerceve_poly()), fill="none", stroke="#FF0000",
                   stroke_width=0.25)]
+    icerik += hiza_isaretleri("#FF0000")
     icerik.append(_el("text", x=6, y=177.2,
                       icerik="ARAÇLAR PUZZLE 320x180 – UV KALIP (1:1)",
                       fill="#888888", font_size="3", font_family="sans-serif"))
-    return svg_belge(W, H, icerik)
+    icerik.append("</g>")
+    return svg_belge(W + 2 * BLEED, H + 2 * BLEED, icerik)
 
 
 def uret_golge_svg():
@@ -1337,6 +1357,7 @@ def uret_golge_svg():
             geoms = g.geoms if g.geom_type == "MultiPolygon" else [g]
             for gg in geoms:
                 ic.append(_el("path", d=yol_svg(gg), fill="#5A6774", opacity=f"{op}"))
+    ic += hiza_isaretleri()
     ic.append("</g>")
     return svg_belge(W + 2 * BLEED, H + 2 * BLEED, ic)
 
@@ -1350,6 +1371,7 @@ def uret_dxf(dosya):
     doc.layers.add("UST_KATMAN_KESIM", color=1)
     doc.layers.add("ALT_KATMAN_KESIM", color=5)
     doc.layers.add("YAZI", color=8)
+    doc.layers.add("HIZA", color=2)          # kesilmez: baskı-kesim hiza haçları
 
     def poli(poly, dx, katman):
         pts, son = [], None
@@ -1369,6 +1391,14 @@ def uret_dxf(dosya):
         poli(hilal, 0, "UST_KATMAN_KESIM")
     dx_alt = W + 15
     poli(cerceve_poly(), dx_alt, "ALT_KATMAN_KESIM")
+
+    # baskı ile kesimi çakıştırmak için 4 köşe hiza haçı — iki panoda da (baskı/kalıp/gölge ile aynı yer)
+    for dx in (0, dx_alt):
+        for mx, my in [(5, 5), (W - 5, 5), (5, H - 5), (W - 5, H - 5)]:
+            x, yy = mx + dx, H - my
+            msp.add_line((x - 3.2, yy), (x + 3.2, yy), dxfattribs={"layer": "HIZA"})
+            msp.add_line((x, yy - 3.2), (x, yy + 3.2), dxfattribs={"layer": "HIZA"})
+            msp.add_circle((x, yy), 2.0, dxfattribs={"layer": "HIZA"})
 
     msp.add_text("UST KATMAN - araclar + cepler (320x180)",
                  dxfattribs={"layer": "YAZI", "height": 6}).set_placement((0, H + 6))

@@ -71,6 +71,9 @@ DXF layers (both boards laid out side by side in one file):
 - `UST_KATMAN_KESIM` — top layer: outer frame + piece contours + the finger-notch crescents (each cut as a separate closed shape).
 - `ALT_KATMAN_KESIM` — flat bottom frame only.
 - `YAZI` — non-cut labels (turn this layer off in the laser software).
+- `HIZA` — non-cut print↔cut registration marks (four crosshair-in-circle fiducials).
+
+Print/cut registration: `uret_baski_svg`, `uret_kalip_svg`, and the DXF `HIZA` layer all carry the same four corner fiducials (via `hiza_isaretleri()`), placed at `(5,5),(W-5,5),(5,H-5),(W-5,H-5)` — outside the rounded frame, in the square-corner waste that the cut discards, so they never show on the toy. The template PDF is emitted at the print's page size (324×184 with the 2 mm bleed offset) so it overlays the print 1:1. Aligning the printed board to the cut by these four marks fully constrains position, rotation, and scale — this is what fixes print-shifted-relative-to-cut drift, which is otherwise a production-side scaling/positioning error (the geometry itself already registers to one 320×180 trim).
 
 Preview PNGs render the notches; the print PDFs never do. Note the exact preview set varies by theme (`araclar` also emits `*_kalip_onizleme.png`); the four core production files are always the same.
 
