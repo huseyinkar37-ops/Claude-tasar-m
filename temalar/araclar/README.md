@@ -29,7 +29,7 @@ Beyaz mürekkep (alt zemin) dosyası bu üretimde **kullanılmıyor** — UV mak
 
 ### Baskı–kesim hizası (register)
 
-Baskı ile kesimin kaymaması için **dört köşe hiza haçı** kullanılır; aynı koordinatta hem baskıda hem kalıpta hem DXF'in `HIZA` katmanında bulunur. Operatör baskılı tahtayı lazere yerleştirirken bu dört noktayı DXF'teki haçlarla çakıştırır — böylece konum, açı **ve ölçek** tam sabitlenir. Kalıp PDF'i, baskıyla birebir üst üste gelsin diye baskıyla aynı sayfa ölçüsündedir (324 × 184 mm, 2 mm bleed). "Baskı kalıba göre kayık" sorunu neredeyse her zaman baskının yanlış ölçek/konumda basılmasından kaynaklanır (dosya geometrisi zaten tek 320 × 180 tırıma oturur); dört haçtan hizalamak bunu giderir.
+**Kalıp SABİT 320 × 180 mm'dir** — ürünün yerleştirildiği fiziksel jigdir, boyu değişmez. Baskı **324 × 184 mm**'dir ve tasarım tam ortalıdır (tasarım merkezi = sayfa merkezi = 162 × 92). Baskıyı **kalıbın merkezine** ortalayınca tasarım dört kenardan **eşit 2'şer mm taşar** (bleed). Ek güvence için baskı, kalıp ve DXF'in `HIZA` katmanında **aynı koordinatta dört köşe hiza haçı** vardır (yuvarlatılmış çerçeve dışı fire alanı, kesince atılır); operatör baskıyı kalıba ortalarken bu dört haçın çakıştığını kontrol edebilir. "Baskı kalıba göre kayık" sorunu neredeyse her zaman baskının yanlış ölçek/konumda basılmasından kaynaklanır (dosya geometrisi zaten tek 320 × 180 merkeze oturur); baskıyı %100 ölçekte basıp kalıp merkezine ortalamak bunu giderir.
 
 ### Marka logosu
 

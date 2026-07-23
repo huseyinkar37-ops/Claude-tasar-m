@@ -688,17 +688,16 @@ def uret_baski_svg(yuva_goster=False):
 
 
 def uret_kalip_svg():
-    """Dış çerçeve + 4 köşe hiza haçı; baskıyla birebir çakışsın diye baskıyla
-    aynı sayfa (324x184) ve 2 mm bleed ofseti kullanır."""
-    icerik = [f'<g transform="translate({BLEED},{BLEED})">',
-              _el("path", d=yol_svg(cerceve_poly()), fill="none", stroke="#FF0000",
+    """UV hizalama kalıbı: 320x180 (ürün yerleştirme jigi) — dış çerçeve + 4 köşe
+    hiza haçı. Kalıp boyu SABİT 320x180. Baskı (324x184) bu kalıbın MERKEZİNE
+    hizalanır; tasarım her kenardan 2 mm taşar (bleed)."""
+    icerik = [_el("path", d=yol_svg(cerceve_poly()), fill="none", stroke="#FF0000",
                   stroke_width=0.25)]
     icerik += hiza_isaretleri("#FF0000")
     icerik.append(_el("text", x=6, y=177.2,
                       icerik="IS MAKINELERI PUZZLE 320x180 – UV KALIP (1:1)",
                       fill="#888888", font_size="3", font_family="sans-serif"))
-    icerik.append("</g>")
-    return svg_belge(W + 2 * BLEED, H + 2 * BLEED, icerik)
+    return svg_belge(W, H, icerik)
 
 
 def uret_golge_svg():
