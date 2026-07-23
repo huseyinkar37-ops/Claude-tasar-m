@@ -25,11 +25,10 @@ Beyaz mürekkep (alt zemin) dosyası bu üretimde **kullanılmıyor** — UV mak
 - `UST_KATMAN_KESIM` (kırmızı): dış çerçeve + 8 araç konturu + **8 parmak yuvası hilali**. Araçları dış çizgisinden keser; parçalar **ve** cepler aynı kesimden çıkar. Hilaller (R 5,5 mm yarım ay, her cebin açık tarafında) ayrı kapalı kesimlerdir: küçük hilal parçası fire olur, cep kenarında parmak yuvası kalır — parça şekli değişmez.
 - `ALT_KATMAN_KESIM` (mavi): düz taban panosu (yalnız dış çerçeve).
 - `YAZI` (gri): etiketler — **kesilmez**, lazer yazılımında kapatın.
-- `HIZA` (sarı): **kesilmez** — baskı↔kesim hizası için dört köşe register haçı. Aynı haçlar baskı ve kalıp PDF'inde de aynı yerdedir (yuvarlatılmış çerçevenin dışında, köşe fire alanında; kesince atılır, oyuncakta görünmez).
 
-### Baskı–kesim hizası (register)
+### Baskı–kesim hizası
 
-**Kalıp SABİT 320 × 180 mm'dir** — ürünün yerleştirildiği fiziksel jigdir, boyu değişmez. Baskı **324 × 184 mm**'dir ve tasarım tam ortalıdır (tasarım merkezi = sayfa merkezi = 162 × 92). Baskıyı **kalıbın merkezine** ortalayınca tasarım dört kenardan **eşit 2'şer mm taşar** (bleed). Ek güvence için baskı, kalıp ve DXF'in `HIZA` katmanında **aynı koordinatta dört köşe hiza haçı** vardır (yuvarlatılmış çerçeve dışı fire alanı, kesince atılır); operatör baskıyı kalıba ortalarken bu dört haçın çakıştığını kontrol edebilir. "Baskı kalıba göre kayık" sorunu neredeyse her zaman baskının yanlış ölçek/konumda basılmasından kaynaklanır (dosya geometrisi zaten tek 320 × 180 merkeze oturur); baskıyı %100 ölçekte basıp kalıp merkezine ortalamak bunu giderir.
+**Kalıp SABİT 320 × 180 mm'dir** — ürünün yerleştirildiği fiziksel jigdir, boyu değişmez. Baskı **324 × 184 mm**'dir ve tasarım tam ortalıdır (tasarım merkezi = sayfa merkezi = 162 × 92). Baskıyı **%100 ölçekte** (sığdırma kapalı) basıp **kalıbın merkezine** ortalayınca tasarım dört kenardan **eşit 2'şer mm taşar** (bleed) ve kesimle çakışır. Baskıda/kalıpta hiza haçı gibi ek işaret **yoktur** — hizalama tamamen merkeze ortalamayla yapılır. "Baskı kalıba göre kayık" sorunu neredeyse her zaman baskının yanlış ölçekte (sığdırılarak) basılmasından ya da merkeze ortalanmamasından kaynaklanır; dosya geometrisi zaten tek 320 × 180 merkeze oturur.
 
 ### Marka logosu
 

@@ -25,7 +25,7 @@ Beyaz mürekkep dosyası kullanılmıyor. Gölge siluetleri 0,4 mm içeri alınm
 - `UST_KATMAN_KESIM` (kırmızı): dış çerçeve + 8 canlı konturu + **8 parmak yuvası hilali** (R 5,5 mm, her cebin açık tarafında).
 - `ALT_KATMAN_KESIM` (mavi): düz taban panosu.
 - `YAZI` (gri): etiketler — kesilmez, lazer yazılımında kapatın.
-- `HIZA` (sarı): **kesilmez** — baskı↔kesim hizası için dört köşe register haçı (aynı haçlar baskı ve kalıp PDF'inde de var; köşe fire alanında, kesince atılır). **Kalıp SABİT 320 × 180 mm** (ürün yerleştirme jigi). Baskı 324 × 184 ve tasarım ortalı; baskıyı kalıbın **merkezine** ortalayınca her kenardan eşit 2 mm taşar. Dört haçın çakışması hizayı doğrular.
+**Baskı–kesim hizası:** **Kalıp SABİT 320 × 180 mm** (ürünün yerleştirildiği fiziksel jig). Baskı 324 × 184 ve tasarım tam ortalı (merkez 162 × 92); baskıyı **%100 ölçekte** basıp kalıbın **merkezine** ortalayınca tasarım her kenardan eşit 2 mm taşar ve kesimle çakışır. Baskıda ek hiza işareti yoktur.
 
 ### Baskı içeriği
 

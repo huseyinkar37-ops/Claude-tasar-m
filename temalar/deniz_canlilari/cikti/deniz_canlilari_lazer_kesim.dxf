@@ -489,7 +489,7 @@ $SKPOLY
   9
 $TDCREATE
  40
-2461245.5591203705
+2461245.566840278
   9
 $TDUCREATE
  40
@@ -497,7 +497,7 @@ $TDUCREATE
   9
 $TDUPDATE
  40
-2461245.5591203705
+2461245.566840278
   9
 $TDUUPDATE
  40
@@ -549,7 +549,7 @@ $SPLINESEGS
   9
 $HANDSEED
   5
-BD
+A4
   9
 $SURFTAB1
  70
@@ -929,11 +929,11 @@ $PSTYLEMODE
   9
 $FINGERPRINTGUID
   2
-{563FD6D8-5DF6-4BCC-842D-7DAD5E2AAB5B}
+{2AE5AA74-1940-4D43-8ADC-40BAF8FC9924}
   9
 $VERSIONGUID
   2
-{63BA4956-9A61-430E-A03D-85E586AF1F32}
+{418CBBDC-EB40-4E35-B33D-65F63D6EA4E3}
   9
 $EXTNAMES
 290
@@ -1323,9 +1323,9 @@ ISM
   0
 CLASS
   1
-ACDBPLACEHOLDER
+LAYOUT
   2
-AcDbPlaceHolder
+AcDbLayout
   3
 ObjectDBX Classes
  90
@@ -1339,9 +1339,9 @@ ObjectDBX Classes
   0
 CLASS
   1
-LAYOUT
+ACDBPLACEHOLDER
   2
-AcDbLayout
+AcDbPlaceHolder
   3
 ObjectDBX Classes
  90
@@ -2233,7 +2233,7 @@ LAYER
 100
 AcDbSymbolTable
  70
-6
+5
   0
 LAYER
   5
@@ -2348,30 +2348,6 @@ YAZI
 0
  62
 8
-  6
-Continuous
-370
--3
-390
-13
-347
-21
-  0
-LAYER
-  5
-8D
-330
-1
-100
-AcDbSymbolTableRecord
-100
-AcDbLayerTableRecord
-  2
-HIZA
- 70
-0
- 62
-2
   6
 Continuous
 370
@@ -3181,7 +3157,7 @@ ACAD
   0
 APPID
   5
-BA
+A1
 330
 3
 100
@@ -3195,7 +3171,7 @@ HATCHBACKGROUNDCOLOR
   0
 APPID
   5
-BB
+A2
 330
 3
 100
@@ -5307,7 +5283,7 @@ ENTITIES
   0
 LWPOLYLINE
   5
-8E
+8D
 330
 17
 100
@@ -5595,7 +5571,7 @@ AcDbPolyline
   0
 LWPOLYLINE
   5
-8F
+8E
 330
 17
 100
@@ -5899,7 +5875,7 @@ AcDbPolyline
   0
 LWPOLYLINE
   5
-90
+8F
 330
 17
 100
@@ -6143,7 +6119,7 @@ AcDbPolyline
   0
 LWPOLYLINE
   5
-91
+90
 330
 17
 100
@@ -6419,7 +6395,7 @@ AcDbPolyline
   0
 LWPOLYLINE
   5
-92
+91
 330
 17
 100
@@ -6735,7 +6711,7 @@ AcDbPolyline
   0
 LWPOLYLINE
   5
-93
+92
 330
 17
 100
@@ -7087,7 +7063,7 @@ AcDbPolyline
   0
 LWPOLYLINE
   5
-94
+93
 330
 17
 100
@@ -7447,7 +7423,7 @@ AcDbPolyline
   0
 LWPOLYLINE
   5
-95
+94
 330
 17
 100
@@ -7871,7 +7847,7 @@ AcDbPolyline
   0
 LWPOLYLINE
   5
-96
+95
 330
 17
 100
@@ -8115,7 +8091,7 @@ AcDbPolyline
   0
 LWPOLYLINE
   5
-97
+96
 330
 17
 100
@@ -8271,7 +8247,7 @@ AcDbPolyline
   0
 LWPOLYLINE
   5
-98
+97
 330
 17
 100
@@ -8411,7 +8387,7 @@ AcDbPolyline
   0
 LWPOLYLINE
   5
-99
+98
 330
 17
 100
@@ -8531,7 +8507,7 @@ AcDbPolyline
   0
 LWPOLYLINE
   5
-9A
+99
 330
 17
 100
@@ -8695,7 +8671,7 @@ AcDbPolyline
   0
 LWPOLYLINE
   5
-9B
+9A
 330
 17
 100
@@ -8847,7 +8823,7 @@ AcDbPolyline
   0
 LWPOLYLINE
   5
-9C
+9B
 330
 17
 100
@@ -8983,7 +8959,7 @@ AcDbPolyline
   0
 LWPOLYLINE
   5
-9D
+9C
 330
 17
 100
@@ -9119,7 +9095,7 @@ AcDbPolyline
   0
 LWPOLYLINE
   5
-9E
+9D
 330
 17
 100
@@ -9227,7 +9203,7 @@ AcDbPolyline
   0
 LWPOLYLINE
   5
-9F
+9E
 330
 17
 100
@@ -9513,553 +9489,9 @@ AcDbPolyline
  20
 179.961
   0
-LINE
-  5
-A0
-330
-17
-100
-AcDbEntity
-  8
-HIZA
-100
-AcDbLine
- 10
-1.7999999999999998
- 20
-175.0
- 30
-0.0
- 11
-8.2
- 21
-175.0
- 31
-0.0
-  0
-LINE
-  5
-A1
-330
-17
-100
-AcDbEntity
-  8
-HIZA
-100
-AcDbLine
- 10
-5.0
- 20
-171.8
- 30
-0.0
- 11
-5.0
- 21
-178.2
- 31
-0.0
-  0
-CIRCLE
-  5
-A2
-330
-17
-100
-AcDbEntity
-  8
-HIZA
-100
-AcDbCircle
- 10
-5.0
- 20
-175.0
- 30
-0.0
- 40
-2.0
-  0
-LINE
-  5
-A3
-330
-17
-100
-AcDbEntity
-  8
-HIZA
-100
-AcDbLine
- 10
-311.8
- 20
-175.0
- 30
-0.0
- 11
-318.2
- 21
-175.0
- 31
-0.0
-  0
-LINE
-  5
-A4
-330
-17
-100
-AcDbEntity
-  8
-HIZA
-100
-AcDbLine
- 10
-315.0
- 20
-171.8
- 30
-0.0
- 11
-315.0
- 21
-178.2
- 31
-0.0
-  0
-CIRCLE
-  5
-A5
-330
-17
-100
-AcDbEntity
-  8
-HIZA
-100
-AcDbCircle
- 10
-315.0
- 20
-175.0
- 30
-0.0
- 40
-2.0
-  0
-LINE
-  5
-A6
-330
-17
-100
-AcDbEntity
-  8
-HIZA
-100
-AcDbLine
- 10
-1.7999999999999998
- 20
-5.0
- 30
-0.0
- 11
-8.2
- 21
-5.0
- 31
-0.0
-  0
-LINE
-  5
-A7
-330
-17
-100
-AcDbEntity
-  8
-HIZA
-100
-AcDbLine
- 10
-5.0
- 20
-1.7999999999999998
- 30
-0.0
- 11
-5.0
- 21
-8.2
- 31
-0.0
-  0
-CIRCLE
-  5
-A8
-330
-17
-100
-AcDbEntity
-  8
-HIZA
-100
-AcDbCircle
- 10
-5.0
- 20
-5.0
- 30
-0.0
- 40
-2.0
-  0
-LINE
-  5
-A9
-330
-17
-100
-AcDbEntity
-  8
-HIZA
-100
-AcDbLine
- 10
-311.8
- 20
-5.0
- 30
-0.0
- 11
-318.2
- 21
-5.0
- 31
-0.0
-  0
-LINE
-  5
-AA
-330
-17
-100
-AcDbEntity
-  8
-HIZA
-100
-AcDbLine
- 10
-315.0
- 20
-1.7999999999999998
- 30
-0.0
- 11
-315.0
- 21
-8.2
- 31
-0.0
-  0
-CIRCLE
-  5
-AB
-330
-17
-100
-AcDbEntity
-  8
-HIZA
-100
-AcDbCircle
- 10
-315.0
- 20
-5.0
- 30
-0.0
- 40
-2.0
-  0
-LINE
-  5
-AC
-330
-17
-100
-AcDbEntity
-  8
-HIZA
-100
-AcDbLine
- 10
-336.8
- 20
-175.0
- 30
-0.0
- 11
-343.2
- 21
-175.0
- 31
-0.0
-  0
-LINE
-  5
-AD
-330
-17
-100
-AcDbEntity
-  8
-HIZA
-100
-AcDbLine
- 10
-340.0
- 20
-171.8
- 30
-0.0
- 11
-340.0
- 21
-178.2
- 31
-0.0
-  0
-CIRCLE
-  5
-AE
-330
-17
-100
-AcDbEntity
-  8
-HIZA
-100
-AcDbCircle
- 10
-340.0
- 20
-175.0
- 30
-0.0
- 40
-2.0
-  0
-LINE
-  5
-AF
-330
-17
-100
-AcDbEntity
-  8
-HIZA
-100
-AcDbLine
- 10
-646.8
- 20
-175.0
- 30
-0.0
- 11
-653.2
- 21
-175.0
- 31
-0.0
-  0
-LINE
-  5
-B0
-330
-17
-100
-AcDbEntity
-  8
-HIZA
-100
-AcDbLine
- 10
-650.0
- 20
-171.8
- 30
-0.0
- 11
-650.0
- 21
-178.2
- 31
-0.0
-  0
-CIRCLE
-  5
-B1
-330
-17
-100
-AcDbEntity
-  8
-HIZA
-100
-AcDbCircle
- 10
-650.0
- 20
-175.0
- 30
-0.0
- 40
-2.0
-  0
-LINE
-  5
-B2
-330
-17
-100
-AcDbEntity
-  8
-HIZA
-100
-AcDbLine
- 10
-336.8
- 20
-5.0
- 30
-0.0
- 11
-343.2
- 21
-5.0
- 31
-0.0
-  0
-LINE
-  5
-B3
-330
-17
-100
-AcDbEntity
-  8
-HIZA
-100
-AcDbLine
- 10
-340.0
- 20
-1.7999999999999998
- 30
-0.0
- 11
-340.0
- 21
-8.2
- 31
-0.0
-  0
-CIRCLE
-  5
-B4
-330
-17
-100
-AcDbEntity
-  8
-HIZA
-100
-AcDbCircle
- 10
-340.0
- 20
-5.0
- 30
-0.0
- 40
-2.0
-  0
-LINE
-  5
-B5
-330
-17
-100
-AcDbEntity
-  8
-HIZA
-100
-AcDbLine
- 10
-646.8
- 20
-5.0
- 30
-0.0
- 11
-653.2
- 21
-5.0
- 31
-0.0
-  0
-LINE
-  5
-B6
-330
-17
-100
-AcDbEntity
-  8
-HIZA
-100
-AcDbLine
- 10
-650.0
- 20
-1.7999999999999998
- 30
-0.0
- 11
-650.0
- 21
-8.2
- 31
-0.0
-  0
-CIRCLE
-  5
-B7
-330
-17
-100
-AcDbEntity
-  8
-HIZA
-100
-AcDbCircle
- 10
-650.0
- 20
-5.0
- 30
-0.0
- 40
-2.0
-  0
 TEXT
   5
-B8
+9F
 330
 17
 100
@@ -10089,7 +9521,7 @@ AcDbText
   0
 TEXT
   5
-B9
+A0
 330
 17
 100
@@ -11207,7 +10639,7 @@ CREATED_BY_EZDXF
   3
 WRITTEN_BY_EZDXF
 350
-BC
+A3
   0
 DICTIONARYVAR
   5
@@ -11219,7 +10651,7 @@ DictionaryVariables
 280
 0
   1
-1.4.4 @ 2026-07-23T13:25:08.744401+00:00
+1.4.4 @ 2026-07-23T13:36:15.305934+00:00
   0
 VISUALSTYLE
   5
@@ -11923,7 +11355,7 @@ X-Ray
   0
 DICTIONARYVAR
   5
-BC
+A3
 330
 2D
 100
@@ -11931,7 +11363,7 @@ DictionaryVariables
 280
 0
   1
-1.4.4 @ 2026-07-23T13:25:08.757664+00:00
+1.4.4 @ 2026-07-23T13:36:15.321578+00:00
   0
 ENDSEC
   0
