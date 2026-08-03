@@ -28,23 +28,26 @@ KAYNAK = os.path.join(KLASOR, "varlik", "kaynak")
 MIN_KALINLIK = 4.0        # ahşap dayanımı: hiçbir kesim detayı bundan ince olamaz
 ZEMIN_ESIK = 236          # bu değerin üstü beyaz zemin sayılır
 
-# Her canlının pano üzerindeki hedef yüksekliği (mm) — düzen bu ölçüye göre kurulur
+# Kaynak görselin hedef yüksekliği (mm). Budama uzuvları kestiği için nihai
+# parça bundan kısa çıkar; kaybı büyük olanlar (yengeç, denizanası) buradan
+# büyütülerek parça boyu 25-40 mm bandında tutulur.
 HEDEF_BOY = {
-    "yunus":        30.0,
-    "denizanasi":   38.0,
+    "yunus":        32.0,
+    "denizanasi":   45.0,
     "denizati":     40.0,
     "kaplumbaga":   34.0,
-    "balik":        30.0,
-    "ahtapot":      34.0,
-    "yengec":       30.0,
+    "balik":        32.0,
+    "ahtapot":      36.0,
+    "yengec":       46.0,
     "denizyildizi": 34.0,
 }
 
 
-def maske_cikar(yol):
+def maske_cikar(yol, rgb_de=False):
     """Görselden dolu siluet maskesi (bool) üretir."""
     im = Image.open(yol).convert("RGB")
     a = np.asarray(im).astype(np.int16)
+    rgb = np.asarray(im).copy()
     # beyaza yakınlık: hem parlak hem renksiz olmalı (sarı/pembe gövdeyi yeme)
     parlak = a.min(axis=2) >= ZEMIN_ESIK
     renksiz = (a.max(axis=2) - a.min(axis=2)) <= 18
@@ -66,7 +69,8 @@ def maske_cikar(yol):
         maske = et == (int(np.argmax(boyut)) + 1)
     # 1 px tırtıkları temizle
     maske = ndimage.binary_opening(maske, np.ones((3, 3)))
-    return ndimage.binary_fill_holes(maske)
+    maske = ndimage.binary_fill_holes(maske)
+    return (maske, rgb) if rgb_de else maske
 
 
 def maske_kontur(maske, mm_px, sadelik=0.35):
@@ -111,13 +115,29 @@ def incelik_raporu(maske, mm_px):
     }
 
 
+PAY_MM = 4.0        # kırpma payı: kesim genişletmesi dizi sınırında kesilmesin
+
+
 def isle(ad):
     yol = os.path.join(KAYNAK, f"{ad}.png")
-    maske = maske_cikar(yol)
+    maske, rgb = maske_cikar(yol, rgb_de=True)
     sat = np.where(maske.any(axis=1))[0]
     sut = np.where(maske.any(axis=0))[0]
-    kirp = maske[sat[0]:sat[-1] + 1, sut[0]:sut[-1] + 1]
-    mm_px = HEDEF_BOY[ad] / kirp.shape[0]
+    mm_px = HEDEF_BOY[ad] / (sat[-1] - sat[0] + 1)
+    p = int(round(PAY_MM / mm_px))
+    r0, r1 = sat[0] - p, sat[-1] + 1 + p
+    c0, c1 = sut[0] - p, sut[-1] + 1 + p
+
+    def _kirp(a, dolgu):
+        h, w = maske.shape
+        ust, alt = max(0, -r0), max(0, r1 - h)
+        sol, sag = max(0, -c0), max(0, c1 - w)
+        kes = a[max(0, r0):min(h, r1), max(0, c0):min(w, c1)]
+        gen = [(ust, alt), (sol, sag)] + [(0, 0)] * (a.ndim - 2)
+        return np.pad(kes, gen, constant_values=dolgu)
+
+    kirp = _kirp(maske, False)
+    kirp_rgb = _kirp(rgb, 255)
     kontur = maske_kontur(kirp, mm_px)
     rapor = incelik_raporu(kirp, mm_px)
     x0, y0, x1, y1 = kontur.bounds
@@ -132,6 +152,7 @@ def isle(ad):
         "ince_pay": rapor["ince_alan_pay"],
         "kontur": kontur,
         "maske": kirp,
+        "rgb": kirp_rgb,
         "ince_maske": rapor["ince_maske"],
     }
 

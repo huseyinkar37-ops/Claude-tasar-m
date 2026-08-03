@@ -19,13 +19,23 @@ Known facts:
 ## Commands
 
 ```bash
-pip install ezdxf cairosvg shapely  # dependencies (Python 3.11+)
+pip install ezdxf cairosvg shapely                    # vektör çizen temalar (araclar)
+pip install numpy scipy scikit-image pillow           # görselden üreten temalar (deniz_canlilari)
 cd temalar/<tema> && python3 olustur.py   # regenerate all production files into cikti/
 ```
 
 There is no test framework; each generator script self-validates its layout on run (piece-to-piece and piece-to-edge clearances) and prints warnings on violations. Treat those warnings as failures.
 
 ## Architecture
+
+There are now **two kinds of theme**, both ending in the same four production files:
+
+- **Vector-drawn** (`araclar`): every shape is composed in code. Described below.
+- **Image-derived** (`deniz_canlilari`): artwork comes from ready-made drawings in `varlik/kaynak/`; `siluet.py` extracts the silhouette and `kesim.py` derives a manufacturable cut contour by pruning (anything thinner than `MIN_KALINLIK` drops out of the cut, then the result is offset 1 mm outward, which doubles as a white sticker border in print). See that theme's README. Do not use morphological closing to bridge gaps — it fills concave bays and turns pieces into rectangles.
+
+Drawing artwork purely in code caps out well short of photorealism; `arastirma/gercekcilik-pilotu/` records that experiment, including the finding that **cairosvg silently ignores every SVG filter** (`feGaussianBlur`, `feTurbulence`, `feDiffuseLighting`, `feSpecularLighting`) while `resvg` renders them correctly. If a theme ever needs soft shadows or procedural texture, render through `resvg`, not cairosvg.
+
+For vector-drawn themes:
 
 - `temalar/<tema>/olustur.py` — one self-contained generator per puzzle theme. Everything is defined in millimeters in SVG-style y-down coordinates and emitted as: print PDF (with bleed offset), template PDF, preview PNGs (via cairosvg), and DXF (via ezdxf, y-axis flipped to y-up).
 - The core abstraction is shapely-based composition: each piece is built as a **union of primitives** (`kutu`/`elips`/`kapsul`/`cokgen`/`daire`), then `birlesim()` applies morphological closing+opening (fillets concave/convex corners, bridges sub-2.6 mm gaps, prunes sub-1.4 mm slivers) and returns ONE exterior ring. That same polygon feeds both the SVG artwork and the DXF polylines, so print and cut can never drift apart.
