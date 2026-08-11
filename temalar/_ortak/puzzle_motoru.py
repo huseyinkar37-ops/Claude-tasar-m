@@ -46,8 +46,8 @@ from shapely.ops import unary_union
 # ---------------------------------------------------------------- sabitler
 BLEED = 2.0                 # her kenardan taşma payı (mm)
 CORNER_R = 8.0              # dış köşe yuvarlatma (mm)
-MIN_GAP = 7.5               # parçalar arası en az duvar (mm)
-MIN_EDGE = 6.0              # parça -> dış kenar (mm)
+MIN_GAP = 10.0              # parçalar arası en az duvar (mm)
+MIN_EDGE = 12.0             # parça -> dış kenar (mm)
 MIN_DETAY = 4.0             # en ince kesilebilir ayrıntı (mm)
 YUVA_CAP = 12.0             # parmak yuvası (yarım ay) çapı (mm)
 YUVA_ACIKLIK = 4.0          # yuva -> diğer parça / dış kenar (mm)
@@ -79,8 +79,8 @@ class Tema:
     baslik: str                      # kalıp PDF'ine yazılan başlık
     parcalar: list
     klasor: str                      # tema klasörünün mutlak yolu
-    W: float = 320.0
-    H: float = 180.0
+    W: float = 450.0
+    H: float = 250.0
     sahne: str = "sahne.png"
     etiket_boyut: float = 4.0
 
@@ -353,6 +353,24 @@ def dogrula(T, veri, yuvalar, etiketler):
 
 
 # ---------------------------------------------------------------- 6. kompozit
+def _kapla(im, tw, th):
+    """Görseli hedef orana ESNETMEDEN sığdırır: ortadan kırpar, sonra ölçekler.
+
+    Kaynak 3:2 üretilir, pano 1.8:1 olabilir; esnetmek konuları deforme ederdi.
+    """
+    kaynak, hedef = im.width / im.height, tw / th
+    if abs(kaynak - hedef) > 1e-4:
+        if kaynak > hedef:                      # kaynak daha geniş -> yandan kırp
+            yeni_w = int(round(im.height * hedef))
+            sol = (im.width - yeni_w) // 2
+            im = im.crop((sol, 0, sol + yeni_w, im.height))
+        else:                                   # kaynak daha uzun -> üst/alttan kırp
+            yeni_h = int(round(im.width / hedef))
+            ust = (im.height - yeni_h) // 2
+            im = im.crop((0, ust, im.width, ust + yeni_h))
+    return im.resize((tw, th), Image.LANCZOS)
+
+
 def kompozit_uret(T, veri):
     """Sahne + parçaları BASKI_DPI çözünürlükte tek rastere birleştirir.
 
@@ -364,7 +382,7 @@ def kompozit_uret(T, veri):
     yol = os.path.join(T.varlik, T.sahne)
     if not os.path.exists(yol):
         raise FileNotFoundError(yol)
-    tuval = Image.open(yol).convert("RGB").resize((tw, th), Image.LANCZOS)
+    tuval = _kapla(Image.open(yol).convert("RGB"), tw, th)
 
     def mm2px(x, y):
         return int(round((x + BLEED) * olcek)), int(round((y + BLEED) * olcek))
@@ -529,6 +547,20 @@ def uret(T):
         print("Yerleşim doğrulandı: paylar, yarım aylar ve ad plakaları kurallara uygun.")
 
     # baskı çözünürlüğü denetimi
+    with Image.open(os.path.join(T.varlik, T.sahne)) as sim:
+        s_w, s_h = sim.size
+    # kırpma sonrası panoya düşen gerçek piksel genişliği
+    hedef_oran = (T.W + 2 * BLEED) / (T.H + 2 * BLEED)
+    etkin_w = s_w if s_w / s_h > hedef_oran else s_w
+    if s_w / s_h > hedef_oran:
+        etkin_w = int(s_h * hedef_oran)
+    s_dpi = etkin_w / (T.W + 2 * BLEED) * 25.4
+    print(f"\nçözünürlük: sahne {s_w}x{s_h} px -> {s_dpi:.0f} dpi")
+    if s_dpi < 150:
+        print(f"  ! sahne {s_dpi:.0f} dpi (<150). Düz vektör stilinde kabul "
+              f"edilebilir ama keskin sonuç için sahneyi en az "
+              f"{int((T.W + 2 * BLEED) / 25.4 * 150)}x"
+              f"{int((T.H + 2 * BLEED) / 25.4 * 150)} px üret ya da yükselt.")
     for k, v in veri.items():
         dpi = v["pxmm"] * 25.4
         if dpi < 150:

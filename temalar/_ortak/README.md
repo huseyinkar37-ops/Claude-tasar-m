@@ -14,8 +14,8 @@ kendi `olustur.py` config dosyasını yazar.
 | ÜST katman | Cepler kesilir. DXF'te parça başına **tek kapalı kontur**; 0,3 mm oturma payı lazer kerfiyle sağlanır. |
 | Parça çıkarma | Her cebin en ferah kenarında **Ø12 mm yarım ay**; ad plakasına asla değmez (kod denetler). |
 | Ahşap dayanımı | 4 mm'den ince kesilebilir ayrıntı yok — ince uçlar otomatik budanır. |
-| Paylar | Parçalar arası ≥ 7,5 mm duvar, dış kenara ≥ 6 mm. |
-| Pano | 320 × 180 mm, dış köşeler 8 mm yuvarlatılmış, her kenardan 2 mm taşma. |
+| Paylar | Parçalar arası ≥ **10 mm** duvar, dış kenara ≥ **12 mm**. |
+| Pano | **450 × 250 mm**, dış köşeler 8 mm yuvarlatılmış, her kenardan 2 mm taşma. |
 
 > **Lazer atölyesine talimat:** *"Kerf 0,3 mm, çizgi üzerinde kes."* Cep de parça da
 > aynı konturdan çıkar; oturma boşluğunu kerf verir. DXF'te ayrı parça yolu yoktur.
@@ -24,7 +24,7 @@ kendi `olustur.py` config dosyasını yazar.
 
 | Dosya | Amaç |
 |---|---|
-| `<tema>_uv_baski.pdf` | ÜST katman baskısı (sahne + parçalar + ad plakaları), 324 × 184 mm taşmalı |
+| `<tema>_uv_baski.pdf` | ÜST katman baskısı (sahne + parçalar + ad plakaları), 454 × 254 mm taşmalı |
 | `<tema>_uv_kalip.pdf` | UV hizalama kalıbı — yalnız dış çerçeve, 1:1 |
 | `<tema>_lazer_kesim.dxf` | ÜST ve ALT panolar yan yana |
 | `<tema>_onizleme.png` | Kesim çizgileri + yarım aylar görünür kontrol baskısı |
@@ -107,8 +107,8 @@ COMPOSITION
   subjects will be placed later: {e.g. left foreground, centre, right middle, sky}.
   These areas must be simple and low-detail — plain ground or plain sky, no busy
   foliage or rocks there.
-- Keep all important content inside a centred 16:9 safe area; the top and bottom
-  12% may be cropped.
+- Keep all important content inside a centred 1.8:1 safe area (the board is 450x250);
+  the top and bottom ~9% will be cropped away.
 - Keep background contrast low so subjects placed on top stay readable.
 
 STRICT
@@ -136,6 +136,26 @@ STRICT
 - NO text, NO watermark, NO frame, NO shadow.
 - 1024x1024 (or 1536x1024 if the subject is wide), highest quality.
 ```
+
+### Çözünürlük — 450 mm panoda dikkat
+
+ChatGPT tek karede en fazla 1536 × 1024 px üretir. 454 mm taşmalı genişlikte bu
+**~86 dpi** eder; UV baskıda alışılmış alt sınır 150 dpi'dır.
+
+| Varlık | Kaynak | Panodaki dpi | Durum |
+|---|---|---|---|
+| Sahne | 1536 × 1024 | ~86 | düşük — aşağıya bak |
+| Sahne (2× yükseltilmiş) | 3072 × 2048 | ~172 | iyi |
+| Parça (90 mm geniş) | 1024 × 1024 | ~230 | iyi |
+| Parça (geniş konu) | 1536 × 1024 | ~300+ | iyi |
+
+Sahne düz vektör stilinde olduğu için 86 dpi'da bile kabul edilebilir görünür
+(keskin kontur yok, geniş düz alanlar var), ama **2× yükseltmek belirgin fark
+yaratır**. Herhangi bir AI upscaler'dan geçirip 3072 × 2048 olarak gönder;
+motor kalanını halleder. Parçalar için yükseltme gerekmez.
+
+Motor her koşuda hem sahnenin hem her parçanın dpi'ını raporlar ve 150'nin
+altına düşeni uyarı olarak basar.
 
 **Neden böyle:**
 

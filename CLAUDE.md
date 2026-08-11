@@ -57,7 +57,8 @@ There is no test framework; each generator script self-validates its layout on r
   aspect ratio rather than 320×180, the source composition rarely satisfies the clearance
   rules, so contours get trimmed equally on both sides of each too-close pair, and print
   resolution must be checked (source px ÷ board mm × 25.4 ≥ 150 dpi).
-- Layout constants that matter: 320×180 mm finished size, 2 mm bleed, 8 mm rounded corners, ≥7.5 mm wall between pieces, ≥6 mm to outer edges, no cut feature narrower than ~4 mm (wood strength). `dogrula()` enforces the clearances with real polygon distances (not bounding boxes).
+- Layout constants that matter — **engine themes**: 450×250 mm finished size, 2 mm bleed, 8 mm rounded corners, ≥10 mm wall between pieces, ≥12 mm to outer edges, Ø12 mm notch, no cut feature narrower than ~4 mm (wood strength). **Legacy themes** were built at 320×180 mm with ≥7.5 mm / ≥6 mm / R 5.5 mm notch — don't "fix" them to the new numbers unless asked. `dogrula()` enforces the clearances with real polygon distances (not bounding boxes).
+- The engine's background is fitted by centre-crop, never stretched: the generated art is 3:2 while the board is 1.8:1, so ~9% of the top and bottom is cropped. Warn about print resolution — a 1536 px-wide scene is only ~86 dpi across 450 mm, so the scene wants a 2× upscale; individual piece images are fine at ~230-300 dpi.
 - DXF layers: `UST_KATMAN_KESIM` (top layer: frame + piece contours), `ALT_KATMAN_KESIM` (flat bottom frame), `YAZI` (non-cut labels). Both boards are laid out side by side in one file.
 
 ## Conventions for New Themes
