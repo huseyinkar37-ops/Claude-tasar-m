@@ -53,7 +53,8 @@ YUVA_CAP = 12.0             # parmak yuvası (yarım ay) çapı (mm)
 YUVA_ACIKLIK = 4.0          # yuva -> diğer parça / dış kenar (mm)
 GRAVUR_ICERI = 0.5          # alt katman gravür konturunun içeri payı (mm)
 KERF = 0.3                  # operatöre bildirilecek oturma payı (mm)
-BASKI_DPI = 300             # kompozit baskı çözünürlüğü
+BASKI_DPI_TAVAN = 300       # kompozit baskı çözünürlüğü tavanı
+BASKI_DPI_TABAN = 150       # ... ve tabanı (UV baskı alt sınırı)
 
 CIZGI = "#20262B"
 
@@ -108,6 +109,36 @@ def _tek(g):
     return Polygon(g.exterior)
 
 
+def _magenta_benzeri(rgb):
+    """Dar magenta tanımı: R ve B yüksek ve birbirine yakın, G düşük.
+
+    Mor/pembe konu renklerini (R ile B'nin ayrıştığı) yanlışlıkla yakalamaz.
+    """
+    r, g, b = rgb[..., 0].astype(int), rgb[..., 1].astype(int), rgb[..., 2].astype(int)
+    return (np.minimum(r, b) - g > 60) & (np.abs(r - b) < 60) & (g < 130)
+
+
+def kenar_temizle(rgb, maske, pay=3):
+    """Anahtarlama sonrası kalan magenta saçağı ve iç benekleri siler.
+
+    Konunun dış `pay` piksellik şeridi ile maske içinde kalmış magenta
+    pikseller, en yakın "temiz" pikselin rengiyle boyanır. Kontur çizgisi koyu
+    olduğu için pratikte koyu hat dışa genişler — saçak gider, silüet aynı kalır.
+    """
+    ic = ndi.binary_erosion(maske, structure=_disk(pay))
+    # magentanın kenar yumuşatma komşuları da bozuk sayılır (dar tanım korunur:
+    # mor/lacivert konu renkleri etkilenmez)
+    mag = ndi.binary_dilation(_magenta_benzeri(rgb), structure=_disk(2))
+    kotu = maske & (mag | ~ic)
+    iyi = maske & ~kotu
+    if not iyi.any() or not kotu.any():
+        return rgb
+    _, (iy, ix) = ndi.distance_transform_edt(~iyi, return_indices=True)
+    out = rgb.copy()
+    out[kotu] = rgb[iy[kotu], ix[kotu]]
+    return out
+
+
 def _magenta_ayikla(yol):
     """Magenta (#FF00FF) zeminli PNG'yi RGBA + boolean maskeye çevirir.
 
@@ -117,6 +148,8 @@ def _magenta_ayikla(yol):
     if im.mode == "RGBA" and np.asarray(im)[..., 3].min() < 250:
         a = np.asarray(im)
         maske = a[..., 3] > 128
+        temiz = kenar_temizle(a[..., :3], maske)
+        im = Image.fromarray(np.dstack([temiz, a[..., 3]]), "RGBA")
     else:
         im = im.convert("RGB")
         a = np.asarray(im).astype(np.int16)
@@ -126,8 +159,8 @@ def _magenta_ayikla(yol):
         # JPEG/yeniden örnekleme saçaklarını temizle
         maske = ndi.binary_opening(maske, structure=_disk(2))
         maske = ndi.binary_closing(maske, structure=_disk(2))
-        a = np.dstack([a.astype(np.uint8),
-                       np.where(maske, 255, 0).astype(np.uint8)])
+        temiz = kenar_temizle(a.astype(np.uint8), maske)
+        a = np.dstack([temiz, np.where(maske, 255, 0).astype(np.uint8)])
         im = Image.fromarray(a, "RGBA")
     if not maske.any():
         raise RuntimeError(f"{yol}: konu bulunamadı (magenta anahtarlama başarısız)")
@@ -371,12 +404,28 @@ def _kapla(im, tw, th):
     return im.resize((tw, th), Image.LANCZOS)
 
 
-def kompozit_uret(T, veri):
-    """Sahne + parçaları BASKI_DPI çözünürlükte tek rastere birleştirir.
+def kompozit_dpi(T, veri):
+    """Kompozit çözünürlüğünü gerçek varlık kalitesine bağlar.
+
+    Kaynaklar 90 dpi iken 300 dpi'a çıkmak bilgi eklemez, yalnız PDF'i şişirir
+    (cairo görüntüyü sıkıştırmasız gömer). En iyi varlığın biraz üstünde kalıp
+    tabanı 150 dpi'da tutarız.
+    """
+    with Image.open(os.path.join(T.varlik, T.sahne)) as sim:
+        s_w, s_h = sim.size
+    hedef_oran = (T.W + 2 * BLEED) / (T.H + 2 * BLEED)
+    etkin_w = int(s_h * hedef_oran) if s_w / s_h > hedef_oran else s_w
+    en_iyi = max([etkin_w / (T.W + 2 * BLEED) * 25.4]
+                 + [v["pxmm"] * 25.4 for v in veri.values()])
+    return int(min(BASKI_DPI_TAVAN, max(BASKI_DPI_TABAN, round(en_iyi * 1.25))))
+
+
+def kompozit_uret(T, veri, dpi):
+    """Sahne + parçaları verilen dpi'da tek rastere birleştirir.
 
     Tuval taşma kutusudur; sahne taşmayı dolduracak şekilde ölçeklenir.
     """
-    olcek = BASKI_DPI / 25.4                       # px/mm
+    olcek = dpi / 25.4                             # px/mm
     tw = int(round((T.W + 2 * BLEED) * olcek))
     th = int(round((T.H + 2 * BLEED) * olcek))
     yol = os.path.join(T.varlik, T.sahne)
@@ -415,10 +464,17 @@ def _yol_svg(poly):
             + " ".join(f"L {x:.3f} {y:.3f}" for x, y in pts[1:]) + " Z")
 
 
-def _png_b64(im):
+def _png_b64(im, kalite=95):
+    """Kompoziti PDF'e gömer. Alfası yoksa yüksek kaliteli JPEG (baskı standardı,
+    kayıpsız PNG'ye göre ~7 kat küçük dosya), varsa PNG."""
     tampon = io.BytesIO()
-    im.save(tampon, format="PNG", optimize=True)
-    return "data:image/png;base64," + base64.b64encode(tampon.getvalue()).decode()
+    if im.mode == "RGB":
+        im.save(tampon, format="JPEG", quality=kalite, subsampling=0, optimize=True)
+        tur = "jpeg"
+    else:
+        im.save(tampon, format="PNG", optimize=True)
+        tur = "png"
+    return f"data:image/{tur};base64," + base64.b64encode(tampon.getvalue()).decode()
 
 
 def _svg(w, h, ic):
@@ -570,7 +626,9 @@ def uret(T):
     os.makedirs(T.cikti, exist_ok=True)
     import cairosvg
 
-    kompozit = kompozit_uret(T, veri)
+    kdpi = kompozit_dpi(T, veri)
+    print(f"  kompozit {kdpi} dpi'da birleştiriliyor")
+    kompozit = kompozit_uret(T, veri, kdpi)
     cairosvg.svg2pdf(bytestring=baski_svg(T, kompozit, etiketler).encode(),
                      write_to=f"{T.cikti}/{T.ad}_uv_baski.pdf")
     cairosvg.svg2pdf(bytestring=kalip_svg(T).encode(),
