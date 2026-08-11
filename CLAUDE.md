@@ -4,7 +4,15 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is a **toy design studio** repository ("tasarım" = design). It produces manufacturing-ready files for two-layer educational children's puzzles: a top layer with vehicle/figure-shaped pockets cut out, glued onto a flat bottom layer. Each theme ships four production files: a UV-print alignment template (1:1 PDF, outer frame contour only), a top-layer UV artwork PDF with 2 mm bleed on every edge, a bottom-layer shadow-print PDF (piece silhouettes inset 0.4 mm, same bleed) so children can match pieces to pockets, and a laser-cutting DXF containing both layers. No white-ink underbase file is used.
+This is a **toy design studio** repository ("tasarım" = design). It produces manufacturing-ready files for two-layer educational children's puzzles: one attractive scene where the pieces, when in place, complete the picture — the child learns the theme's subjects by name. A top layer with the subject-shaped pockets cut out is glued onto a flat bottom layer. No white-ink underbase file is used.
+
+**Current (engine) contract** — `temalar/_ortak/puzzle_motoru.py`, used by all new themes. Three production files: a UV-print alignment template (1:1 PDF, outer frame contour only), a top-layer UV artwork PDF with 2 mm bleed, and a laser-cutting DXF holding both boards. Key rules, owner-specified:
+- Top layer: **one closed contour per piece**; the 0.3 mm seating play comes from the laser kerf — tell the shop *"kerf 0.3 mm, cut on the line"*. No separate piece/pocket paths.
+- Bottom layer: flat, but the piece outlines are **laser-engraved** inset 0.5 mm (`ALT_KATMAN_GRAVUR`) — a hint for the child and it looks good with pieces removed. This replaced the old shadow-print PDF.
+- Each pocket gets a **Ø12 mm half-moon** finger notch on its roomiest edge; it must never touch a name plaque (`dogrula()` enforces this).
+- Piece name plaques are **vector text drawn by the engine**, never baked into the generated artwork.
+
+**Legacy contract** — `araclar`, `deniz_canlilari`, `dinozorlar` predate the engine and still emit a fourth file, a bottom-layer shadow-print PDF (silhouettes inset 0.4 mm), with an R 5.5 mm notch. Don't retrofit them unless asked.
 
 Known facts:
 
@@ -28,7 +36,17 @@ There is no test framework; each generator script self-validates its layout on r
 
 ## Architecture
 
-- `temalar/<tema>/olustur.py` — one self-contained generator per puzzle theme. Everything is defined in millimeters in SVG-style y-down coordinates and emitted as: print PDF (with bleed offset), template PDF, preview PNGs (via cairosvg), and DXF (via ezdxf, y-axis flipped to y-up).
+- `temalar/_ortak/puzzle_motoru.py` — **the shared engine new themes use.** Input is layered
+  assets: `varlik/sahne.png` (subject-free background) plus one `varlik/parca_<key>.png` per
+  piece on flat magenta (#FF00FF). It keys out the magenta, prunes sub-4 mm features, traces
+  the contour (marching squares → mm polygon), relaxes the layout until clearances hold,
+  places notches and label plaques, composites the print at 300 dpi, and emits the three
+  production files. A theme's `olustur.py` is then just a `Tema`/`Parca` config. See
+  `temalar/_ortak/README.md` for the workflow and the ChatGPT image prompts.
+- Always request layered assets, never one flat scene: contours from a single composed
+  illustration leak into background elements, the source composition violates the clearance
+  rules, and a piece lands at ~120 dpi instead of ~300.
+- `temalar/<tema>/olustur.py` — legacy themes are one self-contained generator each. Everything is defined in millimeters in SVG-style y-down coordinates and emitted as: print PDF (with bleed offset), template PDF, preview PNGs (via cairosvg), and DXF (via ezdxf, y-axis flipped to y-up).
 - The core abstraction is shapely-based composition: each piece is built as a **union of primitives** (`kutu`/`elips`/`kapsul`/`cokgen`/`daire`), then `birlesim()` applies morphological closing+opening (fillets concave/convex corners, bridges sub-2.6 mm gaps, prunes sub-1.4 mm slivers) and returns ONE exterior ring. That same polygon feeds both the SVG artwork and the DXF polylines, so print and cut can never drift apart.
 - Each puzzle piece is a `kontur_*()` function returning **one closed contour** (lasers cut the outer outline only — no holes). Printed details (windows, stripes, text, gradients, `hacim()` light/shade overlays, `teker()` wheels) are drawn separately in `arac_detaylari()`, clipped to the contour. Decorative background elements must stay outside all piece bounding boxes.
 - Two kinds of theme exist. **Drawn themes** (`araclar`, `deniz_canlilari`) compose the scene
